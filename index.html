@@ -1,0 +1,4799 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C Dersi: Sayılar, Döngüler, Pointer, Bellek & Matrisler — Adım Adım İnteraktif</title>
+<meta name="description" content="Armstrong, palindrom, Harshad, casus ve mutlu sayılar; iç içe döngüler, pow ve math.h, pointer, malloc/calloc ve matrisleri adım adım, interaktif olarak öğren.">
+<style>
+:root {
+ --bg: #ffffff;
+ --bg-subtle: #f8fafc;
+ --panel: #ffffff;
+ --panel2: #f1f5f9;
+ --line: #e2e8f0;
+ --line-strong: #cbd5e1;
+ --text: #0f172a;
+ --text-soft: #334155;
+ --muted: #64748b;
+ --acc: #2563eb;
+ --acc-hover: #1d4ed8;
+ --acc2: #0284c7;
+ --ok: #16a34a;
+ --ok-bg: #f0fdf4;
+ --ok-border: #bbf7d0;
+ --warn: #d97706;
+ --warn-bg: #fffbeb;
+ --warn-border: #fde68a;
+ --bad: #dc2626;
+ --bad-bg: #fef2f2;
+ --bad-border: #fecaca;
+ --yel: #b45309;
+ --analogy-bg: #f0fdf4;
+ --analogy-border: #86efac;
+ --code-bg: #f8fafc;
+ --code-text: #0f172a;
+ --terminal-bg: #0f172a;
+ --terminal-text: #38bdf8;
+ --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+ --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+ --mono: "JetBrains Mono", "Fira Code", Menlo, Consolas, "Courier New", monospace;
+}
+
+[data-theme="dark"] {
+ --bg: #0b0f19;
+ --bg-subtle: #111827;
+ --panel: #111827;
+ --panel2: #1f2937;
+ --line: #374151;
+ --line-strong: #4b5563;
+ --text: #f9fafb;
+ --text-soft: #e5e7eb;
+ --muted: #9ca3af;
+ --acc: #3b82f6;
+ --acc-hover: #60a5fa;
+ --acc2: #38bdf8;
+ --ok: #22c55e;
+ --ok-bg: #052e16;
+ --ok-border: #166534;
+ --warn: #f59e0b;
+ --warn-bg: #451a03;
+ --warn-border: #78350f;
+ --bad: #ef4444;
+ --bad-bg: #450a0a;
+ --bad-border: #7f1d1d;
+ --yel: #fbbf24;
+ --analogy-bg: #1e1b4b;
+ --analogy-border: #4338ca;
+ --code-bg: #030712;
+ --code-text: #f3f4f6;
+ --terminal-bg: #000000;
+ --terminal-text: #4ade80;
+ --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+ --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+ margin: 0;
+ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ line-height: 1.65;
+ font-size: 15.5px;
+ transition: background-color .2s ease, color .2s ease;
+}
+a { color: var(--acc); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+#progress {
+ position: fixed;
+ top: 0;
+ left: 0;
+ height: 3px;
+ background: var(--acc);
+ width: 0;
+ z-index: 200;
+}
+
+/* Tema Değiştirici Buton */
+#themeToggle {
+ position: fixed;
+ top: 14px;
+ right: 18px;
+ z-index: 160;
+ background: var(--panel2);
+ color: var(--text);
+ border: 1px solid var(--line-strong);
+ border-radius: 20px;
+ padding: 6px 14px;
+ font-size: 13.5px;
+ font-weight: 600;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ gap: 6px;
+ box-shadow: var(--shadow);
+ transition: all .2s;
+}
+#themeToggle:hover {
+ background: var(--line);
+ transform: translateY(-1px);
+}
+
+/* Yan Menü (Sidebar) */
+#side {
+ position: fixed;
+ top: 0;
+ left: 0;
+ bottom: 0;
+ width: 270px;
+ background: var(--bg-subtle);
+ border-right: 1px solid var(--line);
+ overflow-y: auto;
+ padding: 22px 14px 40px;
+ z-index: 150;
+ transition: transform .25s ease;
+}
+#side .logo {
+ font-size: 19px;
+ font-weight: 800;
+ margin: 0 10px 2px;
+ color: var(--text);
+ letter-spacing: -0.5px;
+}
+#side .sub {
+ font-size: 12px;
+ color: var(--muted);
+ margin: 0 10px 14px;
+}
+#side a {
+ display: flex;
+ gap: 10px;
+ align-items: center;
+ padding: 8px 12px;
+ border-radius: 8px;
+ color: var(--text-soft);
+ text-decoration: none;
+ font-size: 14px;
+ font-weight: 500;
+ transition: background .15s, color .15s;
+}
+#side a:hover {
+ background: var(--panel2);
+ color: var(--text);
+}
+#side a.active {
+ background: var(--panel2);
+ color: var(--acc);
+ font-weight: 700;
+}
+#side .num {
+ width: 22px;
+ height: 22px;
+ border-radius: 6px;
+ background: var(--line);
+ color: var(--text);
+ display: grid;
+ place-items: center;
+ font-size: 11.5px;
+ flex-shrink: 0;
+ font-weight: 700;
+}
+#side a.active .num {
+ background: var(--acc);
+ color: #fff;
+}
+#side .grp {
+ font-size: 11px;
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ color: var(--muted);
+ margin: 18px 10px 6px;
+ font-weight: 700;
+}
+#menuBtn {
+ display: none;
+ position: fixed;
+ top: 14px;
+ left: 14px;
+ z-index: 160;
+ background: var(--panel2);
+ color: var(--text);
+ border: 1px solid var(--line);
+ border-radius: 8px;
+ padding: 6px 12px;
+ font-size: 18px;
+ cursor: pointer;
+ box-shadow: var(--shadow);
+}
+main {
+ margin-left: 270px;
+ padding: 30px 48px 80px;
+ max-width: 1200px;
+}
+@media (max-width: 900px) {
+ #side { transform: translateX(-100%); }
+ #side.open { transform: none; }
+ main { margin-left: 0; padding: 60px 16px 60px; }
+ #menuBtn { display: block; }
+}
+
+/* Bölümler ve Başlıklar */
+section {
+ padding: 44px 0 36px;
+ border-bottom: 1px solid var(--line);
+}
+section > h2 {
+ font-size: 28px;
+ margin: 0 0 6px;
+ line-height: 1.3;
+ color: var(--text);
+ letter-spacing: -0.5px;
+}
+section > h2 .tag {
+ font-size: 12px;
+ vertical-align: middle;
+ background: var(--panel2);
+ color: var(--acc);
+ border: 1px solid var(--line);
+ padding: 3px 10px;
+ border-radius: 20px;
+ margin-left: 8px;
+ font-weight: 600;
+}
+h3 {
+ font-size: 19px;
+ margin: 28px 0 10px;
+ color: var(--text);
+}
+.lead {
+ color: var(--muted);
+ font-size: 17px;
+ margin-top: 4px;
+}
+.muted { color: var(--muted); }
+
+/* Kartlar ve Açıklama Kutuları */
+.card {
+ background: var(--panel);
+ border: 1px solid var(--line);
+ border-radius: 12px;
+ padding: 20px;
+ margin: 18px 0;
+ box-shadow: var(--shadow);
+}
+.analogy {
+ background: var(--analogy-bg);
+ border: 1px solid var(--analogy-border);
+ border-left: 5px solid #16a34a;
+ border-radius: 10px;
+ padding: 16px 20px;
+ margin: 18px 0;
+ color: var(--text);
+}
+[data-theme="dark"] .analogy {
+ border-left-color: #818cf8;
+}
+.analogy::before {
+ content: " Mala anlatır gibi:";
+ display: block;
+ font-weight: 800;
+ color: #15803d;
+ margin-bottom: 6px;
+ font-size: 14.5px;
+}
+[data-theme="dark"] .analogy::before {
+ color: #a5b4fc;
+}
+.tip {
+ background: var(--ok-bg);
+ border: 1px solid var(--ok-border);
+ border-left: 5px solid var(--ok);
+ border-radius: 10px;
+ padding: 14px 18px;
+ margin: 16px 0;
+ color: var(--text);
+}
+.warn {
+ background: var(--warn-bg);
+ border: 1px solid var(--warn-border);
+ border-left: 5px solid var(--warn);
+ border-radius: 10px;
+ padding: 14px 18px;
+ margin: 16px 0;
+ color: var(--text);
+}
+.danger {
+ background: var(--bad-bg);
+ border: 1px solid var(--bad-border);
+ border-left: 5px solid var(--bad);
+ border-radius: 10px;
+ padding: 14px 18px;
+ margin: 16px 0;
+ color: var(--text);
+}
+.def {
+ font-size: 16.5px;
+ background: var(--panel2);
+ border: 1px dashed var(--line-strong);
+ border-radius: 10px;
+ padding: 14px 18px;
+ margin: 16px 0;
+}
+
+/* Kod ve Sözdizimi */
+code {
+ font-family: var(--mono);
+ background: var(--panel2);
+ color: var(--text);
+ padding: 2px 6px;
+ border-radius: 5px;
+ font-size: .9em;
+ border: 1px solid var(--line);
+}
+pre.code {
+ background: var(--code-bg);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 14px 16px;
+ overflow-x: auto;
+ font-family: var(--mono);
+ font-size: 13.5px;
+ line-height: 1.6;
+ margin: 12px 0;
+ color: var(--code-text);
+ box-shadow: var(--shadow);
+}
+.c-kw { color: #d946ef; font-weight: 600; }
+.c-ty { color: #0284c7; font-weight: 600; }
+.c-fn { color: #2563eb; font-weight: 600; }
+.c-num { color: #ea580c; }
+.c-str { color: #16a34a; }
+.c-com { color: var(--muted); font-style: italic; }
+.c-pre { color: #e11d48; }
+
+[data-theme="dark"] .c-kw { color: #c084fc; }
+[data-theme="dark"] .c-ty { color: #38bdf8; }
+[data-theme="dark"] .c-fn { color: #60a5fa; }
+[data-theme="dark"] .c-num { color: #fb923c; }
+[data-theme="dark"] .c-str { color: #4ade80; }
+[data-theme="dark"] .c-com { color: #94a3b8; }
+[data-theme="dark"] .c-pre { color: #f43f5e; }
+
+.ok { color: var(--ok); font-weight: 700; }
+.bad { color: var(--bad); font-weight: 700; }
+.y { color: var(--yel); font-weight: 700; }
+.cy { color: var(--acc); font-weight: 700; }
+
+table.t {
+ width: 100%;
+ border-collapse: collapse;
+ margin: 14px 0;
+ font-size: 14.5px;
+ background: var(--panel);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ overflow: hidden;
+ box-shadow: var(--shadow);
+}
+table.t th, table.t td {
+ border-bottom: 1px solid var(--line);
+ padding: 10px 14px;
+ text-align: left;
+ vertical-align: top;
+}
+table.t th {
+ background: var(--panel2);
+ color: var(--text);
+ font-weight: 700;
+}
+.grid2 {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 16px;
+}
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+
+.steps-list { counter-reset: s; list-style: none; padding: 0; }
+.steps-list li {
+ counter-increment: s;
+ position: relative;
+ padding: 8px 0 8px 46px;
+}
+.steps-list li::before {
+ content: counter(s);
+ position: absolute;
+ left: 0;
+ top: 6px;
+ width: 30px;
+ height: 30px;
+ border-radius: 50%;
+ background: var(--acc);
+ color: #fff;
+ display: grid;
+ place-items: center;
+ font-weight: 700;
+ font-size: 13px;
+}
+
+/* Butonlar & Kontroller */
+.btn {
+ background: var(--panel);
+ color: var(--text);
+ border: 1px solid var(--line-strong);
+ padding: 8px 14px;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 13.5px;
+ font-weight: 600;
+ font-family: inherit;
+ transition: all .15s ease;
+ box-shadow: var(--shadow);
+}
+.btn:hover {
+ background: var(--panel2);
+ border-color: var(--acc);
+ transform: translateY(-1px);
+}
+.btn.primary {
+ background: var(--acc);
+ border-color: var(--acc);
+ color: #fff;
+}
+.btn.primary:hover {
+ background: var(--acc-hover);
+}
+.btn.ok {
+ background: var(--ok);
+ border-color: var(--ok);
+ color: #fff;
+}
+.btn.danger {
+ background: var(--bad);
+ border-color: var(--bad);
+ color: #fff;
+}
+.btn.sel {
+ outline: 2px solid var(--acc);
+ border-color: var(--acc);
+}
+.chip {
+ background: var(--panel2);
+ color: var(--acc);
+ border: 1px solid var(--line);
+ border-radius: 20px;
+ padding: 4px 12px;
+ cursor: pointer;
+ font-family: var(--mono);
+ font-size: 12.5px;
+ margin: 2px;
+ transition: all .15s;
+}
+.chip:hover {
+ background: var(--line);
+}
+input[type=number], input[type=text], select {
+ background: var(--panel);
+ color: var(--text);
+ border: 1px solid var(--line-strong);
+ border-radius: 8px;
+ padding: 7px 10px;
+ font-size: 14px;
+ width: 110px;
+ font-family: inherit;
+ box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.05);
+}
+input:focus, select:focus {
+ outline: 2px solid var(--acc);
+ border-color: transparent;
+}
+select { width: auto; }
+input[type=range] { accent-color: var(--acc); }
+label { font-weight: 600; font-size: 14px; }
+.row {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 10px;
+ align-items: center;
+ margin: 8px 0;
+}
+
+/* Stepper (Adım Adım Oynatıcı) */
+.stepper {
+ background: var(--panel);
+ border: 1px solid var(--line);
+ border-radius: 14px;
+ padding: 18px;
+ margin: 20px 0;
+ box-shadow: var(--shadow);
+}
+.st-input {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ align-items: center;
+ margin-bottom: 12px;
+}
+.st-input .ex-l {
+ color: var(--muted);
+ font-size: 13px;
+ margin-left: 6px;
+}
+.st-ctrl {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ align-items: center;
+}
+.st-ctrl .speed {
+ display: flex;
+ align-items: center;
+ gap: 4px;
+ font-size: 13.5px;
+ margin-left: 6px;
+ color: var(--muted);
+}
+.st-ctrl .speed input { width: 90px; }
+.st-count {
+ margin-left: auto;
+ color: var(--muted);
+ font-family: var(--mono);
+ font-size: 13px;
+ font-weight: 600;
+}
+.st-msg {
+ margin: 14px 0;
+ padding: 14px 18px;
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ border-left: 4px solid var(--acc);
+ border-radius: 10px;
+ font-size: 15.5px;
+ min-height: 52px;
+ line-height: 1.6;
+}
+.st-body {
+ display: grid;
+ grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+ gap: 16px;
+}
+@media (max-width: 1050px) { .st-body { grid-template-columns: 1fr; } }
+
+.st-title {
+ font-size: 13px;
+ color: var(--muted);
+ font-weight: 700;
+ margin: 4px 0 6px;
+}
+.st-title small { font-weight: 400; }
+.st-code {
+ background: var(--code-bg);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 10px 0;
+ font-family: var(--mono);
+ font-size: 13px;
+ overflow-x: auto;
+ line-height: 1.7;
+}
+.ln {
+ display: flex;
+ padding: 0 12px 0 6px;
+ white-space: pre;
+ border-left: 4px solid transparent;
+ transition: background .15s;
+}
+.ln .no {
+ color: var(--muted);
+ width: 24px;
+ flex-shrink: 0;
+ text-align: right;
+ margin-right: 14px;
+ user-select: none;
+}
+.ln.active {
+ background: rgba(37, 99, 235, 0.12);
+ border-left-color: var(--acc);
+}
+[data-theme="dark"] .ln.active {
+ background: rgba(59, 130, 246, 0.2);
+}
+.ln.active .no { color: var(--acc); font-weight: 700; }
+.st-viz {
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 14px;
+ min-height: 110px;
+ overflow-x: auto;
+}
+.st-vars {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ margin-bottom: 10px;
+ min-height: 36px;
+}
+.var {
+ background: var(--panel);
+ border: 1px solid var(--line);
+ border-radius: 8px;
+ padding: 5px 10px;
+ font-family: var(--mono);
+ font-size: 13.5px;
+ box-shadow: var(--shadow);
+}
+.var b { color: var(--acc); }
+.var.chg {
+ border-color: var(--acc);
+ animation: pop .55s;
+}
+@keyframes pop {
+ 0% { transform: scale(1.15); background: var(--panel2); }
+ 100% { transform: scale(1); }
+}
+.st-out {
+ background: var(--terminal-bg);
+ color: var(--terminal-text);
+ font-family: var(--mono);
+ border-radius: 10px;
+ padding: 10px 14px;
+ min-height: 42px;
+ margin: 0;
+ white-space: pre-wrap;
+ font-size: 13.5px;
+ border: 1px solid var(--line);
+}
+.vlabel {
+ font-size: 12px;
+ color: var(--muted);
+ text-transform: uppercase;
+ letter-spacing: 1px;
+ font-weight: 700;
+ margin: 6px 0 2px;
+ text-align: center;
+}
+
+/* Rakam Kutuları */
+.digits {
+ display: flex;
+ gap: 8px;
+ flex-wrap: wrap;
+ justify-content: center;
+ margin: 8px 0 12px;
+ min-height: 56px;
+ align-items: center;
+}
+.dg {
+ width: 44px;
+ height: 54px;
+ border-radius: 10px;
+ background: var(--panel);
+ border: 2px solid var(--line-strong);
+ display: grid;
+ place-items: center;
+ font-size: 26px;
+ font-weight: 800;
+ font-family: var(--mono);
+ transition: all .25s ease;
+ box-shadow: var(--shadow);
+}
+.dg.focus {
+ border-color: var(--acc);
+ background: var(--panel2);
+ transform: translateY(-6px);
+ box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+}
+.dg.taken {
+ opacity: .3;
+ text-decoration: line-through;
+}
+.dg.new {
+ border-color: var(--ok);
+ background: var(--ok-bg);
+ color: var(--ok);
+}
+.dg.small {
+ width: 36px;
+ height: 42px;
+ font-size: 20px;
+}
+.eq {
+ font-family: var(--mono);
+ font-size: 16px;
+ text-align: center;
+ margin: 10px 0;
+ line-height: 1.8;
+}
+.eq sup {
+ font-size: .75em;
+ color: var(--acc);
+}
+.result {
+ text-align: center;
+ font-size: 18px;
+ font-weight: 800;
+ padding: 10px;
+ border-radius: 10px;
+ margin-top: 8px;
+}
+.result.yes {
+ background: var(--ok-bg);
+ color: var(--ok);
+ border: 1px solid var(--ok-border);
+}
+.result.no {
+ background: var(--bad-bg);
+ color: var(--bad);
+ border: 1px solid var(--bad-border);
+}
+
+/* Gruplar & Zincir & Terazi */
+.groups {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 6px;
+ justify-content: center;
+ margin: 8px 0;
+}
+.grp-box {
+ border: 1px solid var(--line-strong);
+ border-radius: 8px;
+ padding: 4px;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 3px;
+ max-width: 130px;
+ background: var(--panel);
+}
+.dot {
+ width: 11px;
+ height: 11px;
+ border-radius: 50%;
+ background: var(--acc);
+}
+.dot.rest { background: var(--bad); }
+
+.chain {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 6px;
+ align-items: center;
+ justify-content: center;
+ margin: 8px 0;
+}
+.bub {
+ padding: 6px 12px;
+ border-radius: 20px;
+ background: var(--panel);
+ border: 2px solid var(--line);
+ font-family: var(--mono);
+ font-weight: 800;
+}
+.bub.last { border-color: var(--acc); }
+.bub.one { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.bub.four { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.arr { color: var(--muted); }
+
+.scale {
+ position: relative;
+ height: 110px;
+ margin: 10px auto 0;
+ width: 280px;
+ max-width: 100%;
+}
+.scale .pole {
+ position: absolute;
+ left: 50%;
+ top: 25px;
+ width: 6px;
+ height: 75px;
+ background: var(--line-strong);
+ transform: translateX(-50%);
+ border-radius: 3px;
+}
+.scale .base {
+ position: absolute;
+ left: 50%;
+ bottom: 4px;
+ width: 90px;
+ height: 6px;
+ background: var(--line-strong);
+ transform: translateX(-50%);
+ border-radius: 3px;
+}
+.scale .beam {
+ position: absolute;
+ left: 10%;
+ width: 80%;
+ top: 24px;
+ height: 6px;
+ background: var(--line-strong);
+ border-radius: 3px;
+ transition: transform .5s ease;
+ transform-origin: 50% 50%;
+}
+.scale .pan {
+ position: absolute;
+ top: 8px;
+ width: 80px;
+ transform: translateX(-50%);
+ text-align: center;
+ font-family: var(--mono);
+ font-weight: 800;
+ font-size: 14.5px;
+ background: var(--panel);
+ border: 2px solid var(--acc);
+ border-radius: 8px;
+ padding: 4px 0;
+ box-shadow: var(--shadow);
+}
+.scale .pan.l { left: 0; }
+.scale .pan.r { left: 100%; border-color: #d946ef; }
+
+/* İç İçe Döngü Izgarası */
+.ngrid { display: inline-grid; gap: 5px; margin: auto; }
+.ngwrap { text-align: center; overflow-x: auto; }
+.nc {
+ width: 44px;
+ height: 38px;
+ border-radius: 8px;
+ background: var(--panel);
+ border: 1px solid var(--line);
+ display: grid;
+ place-items: center;
+ font-family: var(--mono);
+ font-size: 12px;
+ color: var(--muted);
+ transition: all .2s;
+}
+.nc.v {
+ background: var(--ok-bg);
+ color: var(--ok);
+ border-color: var(--ok-border);
+ font-weight: 700;
+}
+.nc.c {
+ background: var(--acc);
+ color: #fff;
+ font-weight: 800;
+ transform: scale(1.1);
+ box-shadow: var(--shadow);
+}
+.nc.x { visibility: hidden; }
+.nh {
+ font-family: var(--mono);
+ font-size: 12px;
+ color: var(--muted);
+ display: grid;
+ place-items: center;
+ border-radius: 6px;
+}
+.nh.on { background: var(--acc); color: #fff; font-weight: 700; }
+.clock {
+ font-family: var(--mono);
+ font-size: 52px;
+ font-weight: 800;
+ text-align: center;
+ letter-spacing: 2px;
+ margin: 6px 0;
+}
+.clock .h { color: var(--acc); }
+.clock .m { color: #d946ef; }
+.clock .h.flash { animation: pop .5s; }
+
+/* Sayı Avcısı */
+.hgrid {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 4px;
+ margin: 10px 0;
+ max-height: 320px;
+ overflow-y: auto;
+ padding: 4px;
+}
+.hn {
+ min-width: 40px;
+ padding: 4px 2px;
+ text-align: center;
+ border-radius: 6px;
+ background: var(--panel2);
+ font-family: var(--mono);
+ font-size: 12.5px;
+ color: var(--muted);
+ border: 1px solid var(--line);
+}
+.hn.cur { background: var(--acc); color: #fff; font-weight: 800; }
+.hn.found {
+ background: var(--ok-bg);
+ color: var(--ok);
+ border-color: var(--ok-border);
+ font-weight: 800;
+}
+.hn.no { color: var(--muted); opacity: .7; }
+.stats {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 10px;
+ margin: 10px 0;
+}
+.stat {
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 8px 14px;
+ min-width: 140px;
+}
+.stat b {
+ display: block;
+ font-size: 22px;
+ font-family: var(--mono);
+ color: var(--acc);
+}
+.stat span { font-size: 12px; color: var(--muted); }
+
+/* Bellek & Pointer */
+.mem {
+ position: relative;
+ overflow-x: auto;
+ padding-top: 74px;
+ padding-bottom: 4px;
+}
+.mem svg { position: absolute; top: 0; left: 0; pointer-events: none; }
+.mem-row {
+ display: flex;
+ gap: 16px;
+ align-items: flex-end;
+ width: max-content;
+ padding: 0 6px;
+}
+.mem-frame {
+ border: 1px dashed var(--line-strong);
+ border-radius: 10px;
+ padding: 24px 10px 10px;
+ position: relative;
+ display: flex;
+ gap: 14px;
+ background: var(--panel);
+}
+.mem-frame > .fl {
+ position: absolute;
+ top: 3px;
+ left: 10px;
+ font-size: 11.5px;
+ color: var(--muted);
+ font-family: var(--mono);
+ font-weight: 700;
+}
+.cell { width: 92px; text-align: center; }
+.cell .box {
+ height: 52px;
+ border: 2px solid var(--line-strong);
+ border-radius: 8px;
+ background: var(--panel2);
+ display: grid;
+ place-items: center;
+ font-family: var(--mono);
+ font-size: 18px;
+ font-weight: 800;
+ box-shadow: var(--shadow);
+}
+.cell.ptr .box {
+ border-color: var(--acc);
+ color: var(--acc);
+ font-size: 14.5px;
+}
+.cell .nm {
+ font-family: var(--mono);
+ font-weight: 800;
+ margin-top: 3px;
+ color: var(--text);
+ font-size: 13.5px;
+}
+.cell .ad { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.cell .ty { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.cell.flash .box { animation: pop .6s; border-color: var(--acc); }
+.cell.target .box { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+
+/* Pointer Aritmetiği */
+.arr-cells { display: flex; gap: 4px; flex-wrap: wrap; margin: 12px 0; }
+.ac { width: 80px; text-align: center; }
+.ac .box {
+ height: 48px;
+ border: 2px solid var(--line-strong);
+ border-radius: 8px;
+ background: var(--panel2);
+ display: grid;
+ place-items: center;
+ font-family: var(--mono);
+ font-size: 17px;
+ font-weight: 800;
+ transition: all .2s;
+}
+.ac.on .box {
+ border-color: var(--acc);
+ background: var(--panel);
+ transform: translateY(-5px);
+ box-shadow: var(--shadow-lg);
+}
+.ac.ghost .box {
+ border-style: dashed;
+ border-color: var(--bad);
+ color: var(--bad);
+}
+.ac small { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.ac .pl { font-family: var(--mono); font-size: 12px; color: var(--acc); height: 18px; font-weight: 700; }
+
+/* Heap & Malloc */
+.heapwrap { display: grid; grid-template-columns: 210px 1fr; gap: 16px; }
+@media (max-width: 800px) { .heapwrap { grid-template-columns: 1fr; } }
+.stackbox {
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ border-radius: 12px;
+ padding: 12px;
+}
+.heap {
+ display: grid;
+ grid-template-columns: repeat(8, minmax(0, 1fr));
+ gap: 6px;
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ border-radius: 12px;
+ padding: 12px;
+}
+@media (max-width: 600px) { .heap { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.hc {
+ border: 2px solid var(--line);
+ border-radius: 8px;
+ padding: 4px 2px;
+ text-align: center;
+ background: var(--panel);
+ min-height: 58px;
+ position: relative;
+ transition: all .2s;
+}
+.hc .hv {
+ font-family: var(--mono);
+ font-size: 12.5px;
+ font-weight: 800;
+ color: var(--muted);
+ word-break: break-all;
+}
+.hc .ha { font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+.hc .hi { font-family: var(--mono); font-size: 10px; color: var(--acc); height: 14px; font-weight: 700; }
+.hc.used {
+ border-color: var(--ok);
+ background: var(--ok-bg);
+}
+.hc.used .hv { color: var(--ok); }
+.hc.leak {
+ border-color: var(--bad);
+ background: var(--bad-bg);
+}
+.hc.leak .hv { color: var(--bad); }
+.hc.freed { border-style: dashed; border-color: var(--muted); }
+.legend {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 12px;
+ font-size: 12.5px;
+ color: var(--muted);
+ margin: 8px 0;
+}
+.legend i {
+ display: inline-block;
+ width: 13px;
+ height: 13px;
+ border-radius: 3px;
+ vertical-align: middle;
+ margin-right: 4px;
+ border: 2px solid;
+}
+.hlog {
+ background: var(--terminal-bg);
+ border-radius: 8px;
+ padding: 10px 12px;
+ font-family: var(--mono);
+ font-size: 12.5px;
+ max-height: 180px;
+ overflow-y: auto;
+ color: var(--terminal-text);
+ border: 1px solid var(--line);
+}
+.hmsg {
+ margin: 12px 0;
+ padding: 12px 16px;
+ border-radius: 10px;
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ min-height: 48px;
+}
+.hmsg.w { background: var(--warn-bg); border-color: var(--warn-border); }
+.hmsg.e { background: var(--bad-bg); border-color: var(--bad-border); }
+.hmsg.g { background: var(--ok-bg); border-color: var(--ok-border); }
+
+/* Matrisler */
+.mats {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 20px;
+ align-items: center;
+ justify-content: center;
+}
+.matw { text-align: center; }
+.matw .mn {
+ font-family: var(--mono);
+ font-weight: 800;
+ color: var(--acc);
+ margin-bottom: 4px;
+ font-size: 14px;
+}
+.mat {
+ display: inline-grid;
+ gap: 4px;
+ padding: 6px 8px;
+ border-left: 3px solid var(--line-strong);
+ border-right: 3px solid var(--line-strong);
+ border-radius: 6px;
+ background: var(--panel2);
+}
+.mc {
+ width: 40px;
+ height: 36px;
+ display: grid;
+ place-items: center;
+ background: var(--panel);
+ border-radius: 6px;
+ font-family: var(--mono);
+ font-weight: 700;
+ transition: all .2s;
+ font-size: 14.5px;
+ border: 1px solid var(--line);
+}
+.mc.hl {
+ background: var(--acc);
+ color: #fff;
+ transform: scale(1.1);
+ box-shadow: var(--shadow);
+}
+.mc.done {
+ background: var(--ok-bg);
+ color: var(--ok);
+ border-color: var(--ok-border);
+}
+.op { font-size: 26px; font-weight: 800; color: var(--muted); }
+.calc {
+ font-family: var(--mono);
+ text-align: center;
+ margin-top: 12px;
+ font-size: 15px;
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ padding: 8px;
+ border-radius: 8px;
+ min-height: 20px;
+}
+.medit { display: inline-grid; gap: 4px; }
+.medit input {
+ width: 50px;
+ text-align: center;
+ padding: 5px 2px;
+ font-family: var(--mono);
+}
+.dm {
+ display: flex;
+ gap: 14px;
+ align-items: center;
+ overflow-x: auto;
+ padding: 10px 0;
+}
+.dm-rows { display: flex; flex-direction: column; gap: 6px; }
+.dm-row { display: flex; align-items: center; gap: 8px; }
+.dm-rp {
+ width: 84px;
+ height: 40px;
+ border: 2px solid var(--acc);
+ border-radius: 8px;
+ display: grid;
+ place-items: center;
+ font-family: var(--mono);
+ font-size: 11.5px;
+ background: var(--panel2);
+ line-height: 1.15;
+ text-align: center;
+}
+.dm-cells { display: flex; gap: 3px; }
+.dm-c {
+ width: 38px;
+ height: 40px;
+ border: 2px solid var(--ok);
+ border-radius: 8px;
+ display: grid;
+ place-items: center;
+ font-family: var(--mono);
+ background: var(--ok-bg);
+ color: var(--ok);
+ font-size: 11.5px;
+ line-height: 1.1;
+ text-align: center;
+}
+.bigarr { font-size: 24px; color: var(--muted); }
+
+/* Quiz */
+.quiz { margin: 22px 0; }
+.quiz h4 { margin: 0 0 8px; font-size: 17px; }
+.qq {
+ background: var(--panel);
+ border: 1px solid var(--line);
+ border-radius: 12px;
+ padding: 14px 16px;
+ margin: 10px 0;
+ box-shadow: var(--shadow);
+}
+.qq .qt { font-weight: 700; margin-bottom: 8px; }
+.qq .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.qq .opt {
+ background: var(--panel2);
+ border: 1px solid var(--line-strong);
+ color: var(--text);
+ padding: 8px 14px;
+ border-radius: 8px;
+ cursor: pointer;
+ font-size: 14px;
+ font-family: inherit;
+ text-align: left;
+ transition: all .15s;
+}
+.qq .opt:hover { border-color: var(--acc); }
+.qq .opt.right { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); font-weight: 700; }
+.qq .opt.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.qq .why {
+ margin-top: 8px;
+ font-size: 14px;
+ color: var(--text-soft);
+ display: none;
+ background: var(--panel2);
+ padding: 8px 12px;
+ border-radius: 6px;
+}
+.qq.answered .why { display: block; }
+
+/* Hero */
+.hero { padding: 36px 0 28px; border-bottom: 1px solid var(--line); }
+.hero h1 {
+ font-size: 34px;
+ line-height: 1.2;
+ margin: 0 0 10px;
+ color: var(--text);
+ letter-spacing: -0.5px;
+}
+.roadmap { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.roadmap a {
+ background: var(--panel2);
+ border: 1px solid var(--line);
+ padding: 6px 12px;
+ border-radius: 20px;
+ text-decoration: none;
+ color: var(--text-soft);
+ font-size: 13.5px;
+ font-weight: 500;
+ transition: all .15s;
+}
+.roadmap a:hover {
+ background: var(--line);
+ color: var(--text);
+}
+footer {
+ text-align: center;
+ color: var(--muted);
+ padding: 30px 0;
+ font-size: 13.5px;
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="menuBtn" aria-label="Menü"></button>
+<button id="themeToggle" title="Temayı Değiştir">Karanlık Mod</button>
+
+<nav id="side">
+ <div class="logo">C Dersi Rehberi</div>
+ <div class="sub">Adım adım, interaktif C dersi</div>
+ <a href="#giris"><span class="num">0</span>Başlarken</a>
+ <div class="grp">Sayı Oyunları</div>
+ <a href="#basamak"><span class="num">1</span>Basamak Alma (% ve /)</a>
+ <a href="#armstrong"><span class="num">2</span>Armstrong Sayısı</a>
+ <a href="#palindrom"><span class="num">3</span>Palindrom Sayı</a>
+ <a href="#harshad"><span class="num">4</span>Harshad Sayısı</a>
+ <a href="#casus"><span class="num">5</span>Casus Sayı</a>
+ <a href="#mutlu"><span class="num">6</span>Mutlu Sayı</a>
+ <div class="grp">Mantık & Araçlar</div>
+ <a href="#icice"><span class="num">7</span>İç İçe Döngüler</a>
+ <a href="#math"><span class="num">8</span>pow & math.h</a>
+ <div class="grp">Bellek Dünyası</div>
+ <a href="#pointer"><span class="num">9</span>Pointer</a>
+ <a href="#malloc"><span class="num">10</span>malloc & calloc</a>
+ <a href="#matris"><span class="num">11</span>Fonksiyonlarla Matrisler</a>
+ <div class="grp">Bitiş</div>
+ <a href="#ozet"><span class="num"></span>Kopya Kağıdı</a>
+</nav>
+
+<main>
+
+<!-- ===================================================== 0. GİRİŞ -->
+<section id="giris" class="hero">
+ <h1>C'de Sayılar, Döngüler, Pointer ve Bellek<br>— Adım Adım, Tıkla Gör</h1>
+ <p class="lead">Burada ezber yok. Her kodu <b>satır satır</b> kendin çalıştıracaksın, değişkenlerin kutularda nasıl değiştiğini <b>gözünle</b> göreceksin. Hiçbir şey bilmiyormuşsun gibi anlatıyoruz. </p>
+ <div class="roadmap">
+ <a href="#basamak">1 · Basamak alma</a><a href="#armstrong">2 · Armstrong</a><a href="#palindrom">3 · Palindrom</a><a href="#harshad">4 · Harshad</a><a href="#casus">5 · Casus</a><a href="#mutlu">6 · Mutlu</a><a href="#icice">7 · İç içe döngü</a><a href="#math">8 · pow & math.h</a><a href="#pointer">9 · Pointer</a><a href="#malloc">10 · malloc/calloc</a><a href="#matris">11 · Matrisler</a>
+ </div>
+ <div class="card">
+ <h3 style="margin-top:0"> Bu site nasıl kullanılır?</h3>
+ <ul>
+ <li><b>İleri ▶</b> butonu programı <b>bir adım</b> çalıştırır. <b>◀ Geri</b> bir adım geri sarar. <b>▶ Oynat</b> kendi kendine oynatır (YavaşHızlı ile hızı ayarla).</li>
+ <li>Koddaki <span class="y">sarı satır</span> = bilgisayarın <u>şu anda</u> çalıştırdığı satır.</li>
+ <li><b> Değişkenler</b> = bilgisayarın hafızasındaki kutular. Yeni değişen kutu <span class="y">sarı</span> yanar.</li>
+ <li>Mor kutudaki yazı her adımda <b>ne olduğunu</b> Türkçe anlatır. Önce onu oku!</li>
+ <li>Kendi sayını yazıp <b> Başlat</b>'a bas ya da “Dene:” kısmındaki hazır sayılara tıkla.</li>
+ </ul>
+ <p class="muted" style="margin-bottom:0">Not: Kod parçalarını <code>main()</code> fonksiyonunun içine yazdığını varsay. En üste <code>#include &lt;stdio.h&gt;</code> eklemeyi unutma.</p>
+ </div>
+</section>
+
+<!-- ===================================================== 1. BASAMAK ALMA -->
+<section id="basamak">
+ <h2>1 · Bir Sayının Rakamlarını Tek Tek Almak <span class="tag">HER ŞEYİN TEMELİ</span></h2>
+ <p class="lead">Sonraki 5 konunun (Armstrong, palindrom, Harshad, casus, mutlu) <b>hepsi</b> bu numaraya dayanıyor. Bunu anlarsan gerisi çocuk oyuncağı.</p>
+
+ <div class="analogy">
+ Sayıyı bir <b>tren</b> gibi düşün: <code>153</code> = <b>[1]-[5]-[3]</b> vagonları. Bizim iki sihirli aletimiz var:
+ <ul>
+ <li><code>% 10</code> → “<b>En sondaki vagonda ne var?</b>” diye bakar. <code>153 % 10 = 3</code></li>
+ <li><code>/ 10</code> → “<b>En sondaki vagonu kopar at.</b>” <code>153 / 10 = 15</code></li>
+ </ul>
+ Bu ikisini sırayla tekrarlarsan trendeki bütün vagonları sondan başa doğru tek tek görürsün. Tren bitince (sayı 0 olunca) dur.
+ </div>
+
+ <h3> Önce aletleri tanı: <code>/</code> ve <code>%</code></h3>
+ <div class="grid2">
+ <div class="card">
+ <p style="margin-top:0"><code>/</code> (bölme): İki <b>tam sayıyı</b> bölünce virgülden sonrası <b>çöpe gider</b>. Yuvarlama yok! <code>17 / 5 = 3</code> (3,4 değil).</p>
+ <p><code>%</code> (mod, kalan): Bölmeden <b>artan</b> kısmı verir. <code>17 % 5 = 2</code> → 17 şekeri 5'erli paketlersen 3 paket olur, <b>2 şeker artar</b>.</p>
+ <p style="margin-bottom:0">Herhangi bir sayıyı <b>10</b>'a bölünce kalan her zaman <b>son rakamdır</b>. Çünkü onluk sistemde son rakam “10'a sığmayan” kısımdır.</p>
+ </div>
+ <div class="card">
+ <div class="row"><label>a = <input type="number" id="dm-a" value="17"></label><label>b = <input type="number" id="dm-b" value="5"></label></div>
+ <div id="dm-out"></div>
+ </div>
+ </div>
+
+ <h3>▶ Şimdi çalıştır: Rakamları tek tek koparalım</h3>
+ <div id="st-basamak"></div>
+
+ <div class="tip">
+ <b> BU KALIBI EZBERLE (sınavda hayat kurtarır):</b>
+ <script type="text/x-c">
+while (n > 0) {
+ int basamak = n % 10; // 1) son rakamı al
+ // ... rakamla ne yapacaksan burada yap ...
+ n = n / 10; // 2) son rakamı at
+}</script>
+ Armstrong'da rakamın <b>kuvvetini</b>, Harshad'da rakamların <b>toplamını</b>, casusta <b>toplam + çarpımını</b>, palindromda <b>ters sayıyı</b>, mutluda <b>karelerini</b> hesaplayacağız. Hep aynı döngü!
+ </div>
+ <div class="quiz" data-quiz="basamak"></div>
+</section>
+
+<!-- ===================================================== 2. ARMSTRONG -->
+<section id="armstrong">
+ <h2>2 · Armstrong Sayısı <span class="tag">2 DÖNGÜ + İÇ DÖNGÜ</span></h2>
+ <div class="def"><b>Tanım:</b> Bir sayının her bir basamağının, <b>basamak_sayisi</b> kadar kuvvetini (kendisiyle çarpımını) alıp toplayınca yine sayının <b>kendisi</b> elde ediliyorsa buna Armstrong sayısı denir.<br>
+ Örnek: <code>153</code> sayısı 3 basamaklıdır (basamak_sayisi = 3) → 1³ + 5³ + 3³ = 1 + 125 + 27 = <b>153</b> (Armstrong sayısıdır)</div>
+
+ <div class="analogy">
+ Her rakam bir işçi gibi çalışır. Sayı kaç basamaklıysa her basamak o kadar kere kendisiyle çarpılır (kuvveti hesaplanır) ve elde edilen sonuç bir <b>toplam</b> havuzuna eklenir.
+ İşlem sonunda havuzdaki toplam, sayının orijinal haline eşit çıkarsa sayı Armstrong sayısıdır.<br>
+ Örnek: <code>9474</code> (4 basamaklı) → 9⁴ + 4⁴ + 7⁴ + 4⁴ = 6561 + 256 + 2401 + 256 = 9474 (Eşit çıktı)
+ </div>
+
+ <h3>Planımız (3 Temel Adım)</h3>
+ <ol class="steps-list">
+ <li><b>Kaç basamak var? (basamak_sayisi):</b> Sayıyı 10'a böle böle tüketiriz; her bölmede <code>basamak_sayisi</code> değişkenini 1 artırırız.</li>
+ <li><b>Her basamağın kuvvetini topla:</b> Sayının rakamlarını tek tek alıp içteki bir döngü ile <code>basamak_sayisi</code> kadar kendisiyle çarpar ve <code>toplam</code> değişkenine ekleriz.</li>
+ <li><b>Karşılaştır:</b> <code>toplam == sayi</code> kontrolü yaparız.</li>
+ </ol>
+ <div class="warn"><b>gecici_sayi neden var?</b> Bölme döngüsü sayıyı her turda 10'a bölerek 0 yapar ve tüketir. Eğer orijinal <code>sayi</code> değişkenini doğrudan bölersek en sonda elimizde karşılaştıracak bir değer kalmaz. Bu nedenle orijinal sayının bir kopyasını (<code>gecici_sayi</code>) oluşturup onun üzerinde işlem yaparız.</div>
+
+ <div id="st-armstrong"></div>
+ <div class="tip">Kuvveti hesaplayan iç <code>for</code> döngüsü yerine standart kütüphaneden <code>pow(basamak, basamak_sayisi)</code> fonksiyonu da kullanılabilir (Bölüm 8'de incelenmektedir). Temel mantığı kavramak için önce döngü ile çarparız. 3 basamaklı Armstrong sayıları: <b>153, 370, 371, 407</b>; 4 basamaklılar: <b>1634, 8208, 9474</b>.</div>
+ <div class="quiz" data-quiz="armstrong"></div>
+</section>
+
+<!-- ===================================================== 3. PALİNDROM -->
+<section id="palindrom">
+ <h2>3 · Palindrom Sayı <span class="tag">SAYIYI TERS ÇEVİRME</span></h2>
+ <div class="def"> <b>Tanım:</b> Tersten okununca da aynı olan sayı. <code>121</code>, <code>1221</code>, <code>12321</code> palindromdur. <code>123</code> değildir (tersi 321).<br>Kelime olarak da var: “kayak”, “ey edip adanada pide ye” </div>
+
+ <div class="analogy">
+ Plan çok basit: <b>Sayının tersini hesapla, sonra orijinaliyle karşılaştır.</b> Eşitse palindrom.<br><br>
+ Peki tersini nasıl kurarız? Elimizde boş bir <b>ters</b> kutusu var (0). Asıl sayıdan son rakamı koparıyoruz ve ters'in <b>sağ ucuna</b> ekliyoruz:
+ <ul>
+ <li><code>ters * 10</code> → içindeki rakamları bir basamak <b>sola kaydır</b>, sağda boş bir yer aç. (12 → 120)</li>
+ <li><code>+ b</code> → o boş yere yeni rakamı koy. (120 + 3 → 123)</li>
+ </ul>
+ Yani <code>ters = ters * 10 + b;</code> satırı, “<b>sağa bir rakam ekle</b>” demek. Sayının sonundan aldığımız rakam ters'in sonuna gidiyor → sayı ters dönmüş oluyor!
+ </div>
+
+ <div id="st-palindrom"></div>
+ <div class="quiz" data-quiz="palindrom"></div>
+</section>
+
+<!-- ===================================================== 4. HARSHAD -->
+<section id="harshad">
+ <h2>4 · Harshad (Niven) Sayısı <span class="tag">RAKAM TOPLAMI</span></h2>
+ <div class="def"> <b>Tanım:</b> Sayı, kendi <b>rakamlarının toplamına tam bölünüyorsa</b> Harshad sayısıdır. (Sanskritçe “sevinç veren” demek.)<br>
+ Örnek: <code>18</code> → 1 + 8 = 9 → 18 % 9 = 0 (Doğru) &nbsp;|&nbsp; <code>19</code> → 1 + 9 = 10 → 19 % 10 = 9 (Yanlış)</div>
+
+ <div class="analogy">
+ Elinde <b>sayı kadar şeker</b> var . Sayının rakamlarını topla; o kadar <b>arkadaşın</b> var. Şekerleri arkadaşlarına eşit dağıtmaya çalış.
+ <b>Hiç şeker artmazsa</b> (kalan 0) → Harshad! Bir tane bile artarsa → değil.<br>
+ C'de “tam bölünüyor mu?” sorusunun cevabı: <code>sayi % toplam == 0</code>
+ </div>
+
+ <div id="st-harshad"></div>
+ <div class="quiz" data-quiz="harshad"></div>
+</section>
+
+<!-- ===================================================== 5. CASUS -->
+<section id="casus">
+ <h2>5 · Casus Sayı (Spy Number) <span class="tag">TOPLAM = ÇARPIM</span></h2>
+ <div class="def"> <b>Tanım:</b> Rakamlarının <b>toplamı</b>, rakamlarının <b>çarpımına</b> eşitse casus sayıdır.<br>
+ Örnek: <code>1124</code> → toplam 1+1+2+4 = 8, çarpım 1×1×2×4 = 8 → eşit (Doğru) &nbsp;|&nbsp; <code>123</code> → 6 ve 6 (Doğru)</div>
+
+ <div class="analogy">
+ İki kumbara var: biri <b>toplama kumbarası</b>, biri <b>çarpma kumbarası</b>. Her rakamı ikisine birden atıyoruz. Sonunda bir <b>teraziye</b> koyuyoruz . Terazi dengedeyse → casus!
+ </div>
+ <div class="danger">Uyarı: <b>EN ÇOK YAPILAN HATA:</b> <code>carpim = 0;</code> yazmak. Sıfırı neyle çarparsan çarp <b>sıfır</b>! Çarpım kumbarası her zaman <b>1</b>'den başlar (<code>carpim = 1;</code>), toplama kumbarası <b>0</b>'dan başlar. Çünkü 1 çarpmada, 0 toplamada “hiçbir şeyi değiştirmeyen” sayıdır.</div>
+
+ <div id="st-casus"></div>
+ <div class="tip">İpucu: Rakamlarından biri <b>0</b> olan bir sayı (10 hariç tüm “içinde 0 olan” sayılar) asla casus olamaz: çarpım 0 olur ama toplam 0'dan büyüktür.</div>
+ <div class="quiz" data-quiz="casus"></div>
+</section>
+
+<!-- ===================================================== 6. MUTLU -->
+<section id="mutlu">
+ <h2>6 · Mutlu Sayı (Happy Number) <span class="tag">İLK GERÇEK İÇ İÇE DÖNGÜ</span></h2>
+ <div class="def"> <b>Tanım:</b> Sayının rakamlarının <b>karelerini</b> topla, çıkan sayıyla aynı işlemi tekrarla. Sonunda <b>1</b>'e ulaşırsan sayı <b>mutludur</b> .
+ Ulaşamazsan sonsuza kadar bir döngüde döner durur → <b>mutsuzdur</b> .<br>
+ Örnek: <code>19</code> → 1²+9² = <b>82</b> → 8²+2² = <b>68</b> → 6²+8² = <b>100</b> → 1²+0²+0² = <b>1</b> </div>
+
+ <div class="analogy">
+ Bir <b>labirent oyunu</b> düşün. Her sayı bir oda. Odadan çıkış kapısı: “rakamlarının kareleri toplamı” numaralı oda. Hedef: <b>1 numaralı oda</b> (çıkış).<br>
+ Mutsuz sayılar ise hep aynı <b>kısır döngüye</b> düşer: <code>4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4 → ...</code><br>
+ Bu yüzden program şöyle düşünür: “<b>1'e gelirsem kazandım, 4'e gelirsem kaybettim</b> (zaten o döngüye girdim), ikisinden birine gelene kadar devam.”
+ </div>
+ <div class="tip"> Bu programda <b>iki döngü iç içe</b>: <b>Dış döngü</b> “yeni sayıya geç” işini, <b>iç döngü</b> “bu sayının rakamlarının karelerini topla” işini yapar. Dış döngü 1 tur atınca iç döngü baştan sona tamamen döner. (Detayı bir sonraki bölümde!)</div>
+
+ <div id="st-mutlu"></div>
+ <div class="quiz" data-quiz="mutlu"></div>
+</section>
+
+<!-- ===================================================== 7. İÇ İÇE DÖNGÜ -->
+<section id="icice">
+ <h2>7 · İç İçe Döngüler <span class="tag">DÖNGÜ İÇİNDE DÖNGÜ</span></h2>
+ <p class="lead">Armstrong'da <code>while</code> içinde <code>for</code>, mutlu sayıda <code>while</code> içinde <code>while</code> kullandık. Şimdi bu işin mantığını kafana tam oturtalım.</p>
+
+ <div class="analogy">
+ <b>Duvar saatine</b> bak ⏰. <b>Yelkovan</b> (dakika) tam bir tur (60 dakika) atmadan <b>akrep</b> (saat) bir adım bile ilerlemez.<br>
+ <ul>
+ <li><b>Akrep = DIŞ döngü</b> (yavaş olan)</li>
+ <li><b>Yelkovan = İÇ döngü</b> (hızlı olan)</li>
+ </ul>
+ Akrep 1 adım atınca yelkovan <b>0'dan 59'a kadar baştan sona</b> döner. Akrep 24 adım atarsa yelkovan toplam <b>24 × 60 = 1440</b> adım atar.<br>
+ <b>Altın kural: Toplam iç döngü çalışması = dış döngü sayısı × iç döngü sayısı.</b>
+ </div>
+
+ <div class="card">
+ <h3 style="margin-top:0">⏰ Saati döngüyle çalıştır</h3>
+ <div class="grid2">
+ <div>
+ <script type="text/x-c">
+for (int saat = 0; saat < 24; saat++) { // DIŞ: akrep
+ for (int dakika = 0; dakika < 60; dakika++) { // İÇ: yelkovan
+ printf("%02d:%02d\n", saat, dakika);
+ }
+}</script>
+ <div class="row"><button class="btn primary" id="clk-play">▶ Başlat</button><button class="btn" id="clk-reset">↺ Sıfırla</button><label>Hız <input type="range" id="clk-speed" min="1" max="10" value="6"></label></div>
+ </div>
+ <div>
+ <div class="clock"><span class="h" id="clk-h">00</span>:<span class="m" id="clk-m">00</span></div>
+ <div class="stats" style="justify-content:center">
+ <div class="stat"><b id="clk-outer">1</b><span>dış döngü turu (saat)</span></div>
+ <div class="stat"><b id="clk-inner">0</b><span>iç döngü çalışması (printf)</span></div>
+ </div>
+ <p class="muted" style="text-align:center;margin:0">Dakika 59'dan 60'a gelince iç döngü biter → saat 1 artar → dakika <b>tekrar 0'dan</b> başlar.</p>
+ </div>
+ </div>
+ </div>
+
+ <h3>▶ Adım adım: Yıldızlarla dikdörtgen ve üçgen</h3>
+ <p>Satır sayısını (dış döngü) ve sütun sayısını (iç döngü) seç. Sonra <b>Üçgen</b> modunu dene: iç döngünün sınırı sabit değil, <code>i</code>'ye bağlı olunca ne oluyor?</p>
+ <div class="card">
+ <div class="row">
+ <label>Satır (dış) <input type="number" id="ng-r" value="3" min="1" max="6"></label>
+ <label>Sütun (iç) <input type="number" id="ng-c" value="4" min="1" max="8"></label>
+ <label>Şekil <select id="ng-shape"><option value="rect">Dikdörtgen (j &lt;= sütun)</option><option value="tri">Üçgen (j &lt;= i)</option></select></label>
+ <button class="btn primary" id="ng-go"> Yükle</button>
+ </div>
+ <div id="st-nested"></div>
+ </div>
+
+ <h3> Sayı Avcısı: Bir aralıktaki TÜM özel sayıları bul</h3>
+ <p>Şimdiye kadar tek bir sayıyı kontrol ettik. Bir aralıktaki <b>bütün</b> sayıları kontrol etmek için o kodu bir <code>for</code> döngüsünün <b>içine</b> koyarız. İşte iç içe döngünün en çok kullanıldığı yer!</p>
+ <div class="analogy">
+ <b>Dış döngü</b> = Kapı kapı dolaşan postacı (her sayıya tek tek uğrar).<br>
+ <b>İç döngü</b> = Her kapıda o evdeki herkesi (rakamları) tek tek sayması.<br>
+ Postacı 1000 eve gidiyorsa ve her evde 3 kişi varsa toplam 3000 kişiyle konuşur.
+ </div>
+ <div class="card">
+ <div class="row">
+ <label>Tür <select id="hu-type">
+ <option value="armstrong">Armstrong</option><option value="palindrom">Palindrom</option><option value="harshad">Harshad</option><option value="casus">Casus</option><option value="mutlu">Mutlu</option>
+ </select></label>
+ <label>Başlangıç <input type="number" id="hu-a" value="1"></label>
+ <label>Bitiş <input type="number" id="hu-b" value="500"></label>
+ <button class="btn primary" id="hu-go"> Avla</button>
+ <button class="btn" id="hu-fast"> Anında göster</button>
+ </div>
+ <div class="grid2">
+ <div><div id="hu-code"></div></div>
+ <div>
+ <div class="stats">
+ <div class="stat"><b id="hu-outer">0</b><span>DIŞ döngü turu (kontrol edilen sayı)</span></div>
+ <div class="stat"><b id="hu-inner">0</b><span>İÇ döngü turu (toplam rakam işlemi)</span></div>
+ <div class="stat"><b id="hu-found">0</b><span>bulunan</span></div>
+ </div>
+ <div id="hu-res" class="muted"></div>
+ </div>
+ </div>
+ <div id="hu-grid" class="hgrid"></div>
+ </div>
+ <div class="quiz" data-quiz="icice"></div>
+</section>
+
+<!-- ===================================================== 8. MATH -->
+<section id="math">
+ <h2>8 · pow ve math.h Fonksiyonları <span class="tag">HAZIR MATEMATİK</span></h2>
+ <p class="lead">Her şeyi elle döngüyle yazmak zorunda değilsin. C'nin hazır bir matematik kutusu var: <code>math.h</code>.</p>
+
+ <div class="analogy">
+ <code>math.h</code> bir <b>alet çantası</b> . İçinde kuvvet alan (<code>pow</code>), karekök alan (<code>sqrt</code>), yuvarlayan (<code>round</code>) hazır aletler var. Kullanmak için önce çantayı açman lazım:
+ <code>#include &lt;math.h&gt;</code>. Sonra aleti çağır, içine sayıları ver, sana sonucu geri versin. Tıpkı hesap makinesindeki tuşlar gibi.
+ </div>
+
+ <div class="warn">
+ Dikkat: <b>3 altın kural:</b>
+ <ol style="margin:6px 0 0">
+ <li>En üste <code>#include &lt;math.h&gt;</code> yaz.</li>
+ <li>Linux/Mac'te derlerken sona <code>-lm</code> ekle: <code>gcc kod.c -o kod -lm</code> (yoksa “undefined reference to pow” hatası alırsın).</li>
+ <li>Bu fonksiyonların neredeyse hepsi <b>double</b> (ondalıklı) döndürür. Yazdırırken <code>%d</code> değil <code>%f</code> veya <code>%lf</code> kullan!</li>
+ </ol>
+ </div>
+
+ <h3> C Hesap Makinesi — fonksiyonu seç, dene</h3>
+ <div class="card">
+ <div class="row" id="mc-btns"></div>
+ <div class="row" id="mc-inputs"></div>
+ <div id="mc-desc" class="tip" style="margin:10px 0"></div>
+ <pre class="code" id="mc-code"></pre>
+ <div class="st-title"> Ekran çıktısı</div>
+ <pre class="st-out" id="mc-out"></pre>
+ </div>
+
+ <h3> En çok kullanılanlar</h3>
+ <table class="t">
+ <tr><th>Fonksiyon</th><th>Ne yapar? (mala anlatır gibi)</th><th>Örnek</th></tr>
+ <tr><td><code>pow(x, y)</code></td><td>x'i y kere kendisiyle çarpar (x üzeri y)</td><td><code>pow(2, 5)</code> → 32.0</td></tr>
+ <tr><td><code>sqrt(x)</code></td><td>Karekök: “Hangi sayıyı kendisiyle çarparsam x olur?”</td><td><code>sqrt(81)</code> → 9.0</td></tr>
+ <tr><td><code>cbrt(x)</code></td><td>Küpkök</td><td><code>cbrt(27)</code> → 3.0</td></tr>
+ <tr><td><code>fabs(x)</code></td><td>Mutlak değer (ondalıklı): eksiyi siler</td><td><code>fabs(-3.7)</code> → 3.7</td></tr>
+ <tr><td><code>abs(x)</code></td><td>Mutlak değer (tam sayı) — <b>stdlib.h</b>'de!</td><td><code>abs(-5)</code> → 5</td></tr>
+ <tr><td><code>ceil(x)</code></td><td>Tavan: her zaman <b>yukarı</b> yuvarlar</td><td><code>ceil(2.1)</code> → 3.0</td></tr>
+ <tr><td><code>floor(x)</code></td><td>Taban: her zaman <b>aşağı</b> yuvarlar</td><td><code>floor(2.9)</code> → 2.0</td></tr>
+ <tr><td><code>round(x)</code></td><td>En yakına yuvarlar (.5 → sıfırdan uzağa)</td><td><code>round(2.5)</code> → 3.0</td></tr>
+ <tr><td><code>fmod(x, y)</code></td><td>Ondalıklı sayılarda kalan (% sadece int ile çalışır)</td><td><code>fmod(7.5, 2)</code> → 1.5</td></tr>
+ <tr><td><code>log10(x)</code></td><td>“10'u kaçıncı kuvvete kaldırırsam x olur?”</td><td><code>log10(1000)</code> → 3.0</td></tr>
+ </table>
+
+ <div class="danger">
+ Uyarı: <b>pow tuzağı:</b> <code>pow</code> double döndürür ve bazı derleyicilerde <code>pow(5, 2)</code> sonucu <code>25.0</code> değil <code>24.99999999</code> çıkabilir.
+ Bunu <code>int</code>'e çevirince virgülden sonrası atılır → <b>24</b> olur! Armstrong'da sonucu bozar.<br>
+ (Doğru) Çözüm: <code>(int) round(pow(b, n))</code> yaz ya da Bölüm 2'deki gibi kuvveti kendi <code>for</code> döngünle hesapla.
+ </div>
+
+ <h3> Bonus: log10 ile tek satırda basamak sayısı</h3>
+ <div class="card">
+ <p style="margin-top:0">Armstrong'daki “kaç basamak var?” döngüsü yerine: <code>int n = (int)log10(sayi) + 1;</code> Mantığı: 100 ile 999 arasındaki sayıların log10'u 2,xxx'tir. Virgülden sonrasını atıp 1 eklersek 3 olur!</p>
+ <div class="row"><label>Sayı <input type="number" id="lg-n" value="4567"></label></div>
+ <div id="lg-out" class="eq" style="text-align:left"></div>
+ </div>
+
+ <h3> Armstrong'un pow ile kısa hali</h3>
+ <script type="text/x-c">
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+ int sayi, gecici_sayi, basamak_sayisi, toplam = 0;
+ printf("Bir sayi gir: ");
+ scanf("%d", &sayi);
+
+ basamak_sayisi = (int)log10(sayi) + 1; // basamak sayısını log10 ile bul
+ gecici_sayi = sayi;
+ while (gecici_sayi > 0) {
+ int basamak = gecici_sayi % 10;
+ toplam += (int)round(pow(basamak, basamak_sayisi)); // iç döngü yerine pow
+ gecici_sayi /= 10;
+ }
+
+ if (toplam == sayi) printf("%d Armstrong!\n", sayi);
+ else printf("%d Armstrong degil.\n", sayi);
+ return 0;
+}
+// derleme: gcc armstrong.c -o armstrong -lm</script>
+ <div class="quiz" data-quiz="math"></div>
+</section>
+
+<!-- ===================================================== 9. POINTER -->
+<section id="pointer">
+ <h2>9 · Pointer (İşaretçi) <span class="tag">ADRES TUTAN DEĞİŞKEN</span></h2>
+ <p class="lead">Herkesin korktuğu konu. Ama aslında tek bir fikir: <b>Bir şeyin kendisi yerine, nerede durduğunu (adresini) tutmak.</b></p>
+
+ <div class="analogy">
+ Bilgisayarın hafızası (RAM) dev bir <b>apartman</b> . Her dairenin bir <b>kapı numarası</b> (adres) var: 0x100, 0x104, ...<br>
+ <ul>
+ <li><code>int a = 5;</code> → Bir daire kirala, adını <b>a</b> koy, içine <b>5</b> koy.</li>
+ <li><b>Pointer</b> → İçinde eşya değil, <b>başka bir dairenin kapı numarası yazan bir kâğıt</b> olan daire.</li>
+ <li><code>&amp;a</code> → “a'nın <b>kapı numarası</b> ne?” (adres alma operatörü)</li>
+ <li><code>*p</code> → “p'deki kâğıtta yazan <b>adrese git</b>, oradaki daireye dokun.” (içerik operatörü)</li>
+ </ul>
+ Bir arkadaşına evinin <b>adresini</b> verirsen evine gidip <b>eşyaları değiştirebilir</b>. Evin <b>fotoğrafını</b> verirsen fotoğrafı karalasa bile evine bir şey olmaz. Pointer = adres vermek!
+ </div>
+
+ <table class="t">
+ <tr><th>Yazım</th><th>Okunuşu</th><th>Anlamı</th></tr>
+ <tr><td><code>int *p;</code></td><td>“p, bir int'in adresini tutar”</td><td>Pointer tanımlama. Buradaki * “ben pointer'ım” demek.</td></tr>
+ <tr><td><code>p = &amp;a;</code></td><td>“p'ye a'nın adresini koy”</td><td>Artık p, a'yı <b>gösteriyor</b> (ok işareti).</td></tr>
+ <tr><td><code>*p</code></td><td>“p'nin gösterdiği yer”</td><td>Kullanırken yazılan * → “adrese git”. <code>*p = 20;</code> aslında <code>a = 20;</code> demek.</td></tr>
+ <tr><td><code>p</code></td><td>“p'nin içindeki adres”</td><td>Ör: 0x100</td></tr>
+ <tr><td><code>&amp;p</code></td><td>“p'nin kendi adresi”</td><td>p de bir değişken, onun da bir dairesi var!</td></tr>
+ </table>
+
+ <h3>▶ Adım adım: Oklarla pointer</h3>
+ <div id="st-ptr"></div>
+
+ <h3> Pointer neden lazım? Klasik “swap” (değiş tokuş) örneği</h3>
+ <p>Bir fonksiyon yazalım: iki sayının yerini değiştirsin. Önce <b>yanlış</b> yolu (değer ile gönderme), sonra <b>doğru</b> yolu (adres ile gönderme) çalıştır ve farkı gör.</p>
+ <div class="row"><button class="btn danger sel" id="sw-val">(Yanlış) Değer ile (fotokopi)</button><button class="btn ok" id="sw-ptr">(Doğru) Adres ile (pointer)</button></div>
+ <div id="st-swap"></div>
+ <div class="tip">İpucu: <b>scanf'teki &amp; işaretinin sırrı çözüldü!</b> <code>scanf("%d", &amp;x);</code> yazarken scanf'e x'in <b>adresini</b> veriyoruz ki klavyeden okuduğu sayıyı gidip x'in içine <b>yazabilsin</b>. Sadece <code>x</code> verseydik fotokopisini alırdı, x değişmezdi.</div>
+
+ <h3> Pointer aritmetiği: Diziler ve pointer kardeştir</h3>
+ <div class="analogy">Dizi = <b>yan yana dizilmiş daireler</b>. Dizinin adı (<code>dizi</code>) ilk dairenin adresidir. <code>p + 1</code> “bir sonraki daire” demek. Ama dikkat: int daireler 4 bayt genişliğinde olduğu için adres <b>1 değil 4</b> artar! Bilgisayar bunu senin yerine hesaplar.</div>
+ <div class="card">
+ <div class="row">
+ <label>Dizi tipi <select id="pa-type"><option value="int">int (4 bayt)</option><option value="char">char (1 bayt)</option><option value="double">double (8 bayt)</option></select></label>
+ <label>k = <input type="range" id="pa-k" min="0" max="5" value="0"> <b id="pa-kv" class="y">0</b></label>
+ </div>
+ <pre class="code" id="pa-code"></pre>
+ <div id="pa-cells" class="arr-cells"></div>
+ <div id="pa-info" class="eq" style="text-align:left"></div>
+ </div>
+
+ <div class="danger">
+ Uyarı: <b>Pointer hataları (program çöker!):</b>
+ <ul style="margin:6px 0 0">
+ <li><b>Başlatılmamış pointer:</b> <code>int *p; *p = 5;</code> → p rastgele bir adres tutuyor, rastgele bir daireye zorla giriyorsun. </li>
+ <li><b>NULL pointer:</b> <code>int *p = NULL; *p = 5;</code> → “hiçbir yer” adresine gidemezsin. Segmentation fault </li>
+ <li><b>Tip karıştırma:</b> <code>int *p = &amp;x;</code> derken x <code>double</code> ise yanlış okursun. Pointer tipi = gösterdiği şeyin tipi.</li>
+ </ul>
+ </div>
+ <div class="quiz" data-quiz="pointer"></div>
+</section>
+
+<!-- ===================================================== 10. MALLOC -->
+<section id="malloc">
+ <h2>10 · malloc, calloc, realloc, free <span class="tag">DİNAMİK BELLEK</span></h2>
+ <p class="lead">Dizi boyutunu program <b>çalışırken</b> öğreniyorsan (ör. kullanıcı kaç sayı gireceğini söylüyor) belleği o anda <b>kiralaman</b> gerekir.</p>
+
+ <div class="analogy">
+ İki çeşit hafıza var:
+ <ul>
+ <li><b>Stack (yığın)</b> = Okuldaki <b>sıran</b>. Küçük, otomatik. Fonksiyon bitince (ders bitince) üstündekiler otomatik toplanır. <code>int a;</code> burada durur.</li>
+ <li><b>Heap (öbek)</b> = <b>Depo kiralama</b> şirketi . Büyük. İstediğin kadar yer kiralarsın ama <b>teslim etmeyi sen unutmamalısın</b>. Kimse senin yerine toplamaz.</li>
+ </ul>
+ <code>malloc</code> = “Bana şu kadar kutu kirala.” (Depo <b>temizlenmeden</b> verilir; önceki kiracının çöpleri içinde!)<br>
+ <code>calloc</code> = “Kirala ve <b>temizleyip</b> ver.” (Her yer 0)<br>
+ <code>realloc</code> = “Kiraladığım yeri <b>büyüt/küçült</b>.” (Yer yoksa seni daha büyük bir depoya taşır, eşyalarını da taşır.)<br>
+ <code>free</code> = “Kirayı bitir, <b>anahtarı teslim et</b>.” 
+ </div>
+
+ <table class="t">
+ <tr><th></th><th>malloc</th><th>calloc</th></tr>
+ <tr><td>Yazılışı</td><td><code>malloc(n * sizeof(int))</code></td><td><code>calloc(n, sizeof(int))</code></td></tr>
+ <tr><td>Parametre</td><td>1 tane: toplam bayt</td><td>2 tane: eleman sayısı, eleman boyutu</td></tr>
+ <tr><td>İçindeki değerler</td><td><span class="bad">Çöp (rastgele)</span></td><td><span class="ok">Hepsi 0</span></td></tr>
+ <tr><td>Hız</td><td>Biraz daha hızlı</td><td>Sıfırlama yüzünden biraz yavaş</td></tr>
+ <tr><td>Başarısız olursa</td><td colspan="2"><code>NULL</code> döndürür → <b>her zaman kontrol et!</b></td></tr>
+ <tr><td>Kütüphane</td><td colspan="2"><code>#include &lt;stdlib.h&gt;</code></td></tr>
+ </table>
+
+ <h3> Heap Simülatörü — kendin kirala, kendin teslim et</h3>
+ <p>Butonlara basarak C komutlarını çalıştır. Her kutu bir <code>int</code> (4 bayt). Önce <b>malloc</b> yap ve içindeki çöpe bak; sonra <b>calloc</b> ile karşılaştır. Hataları da bilerek yap: free etmeden tekrar malloc (sızıntı), free'den sonra yazma, dizi dışına yazma...</p>
+ <div class="card">
+ <div class="row">
+ <label>n = <input type="number" id="hp-n" value="5" min="1" max="12"></label>
+ <button class="btn primary" id="hp-malloc">malloc(n)</button>
+ <button class="btn primary" id="hp-calloc">calloc(n)</button>
+ <button class="btn" id="hp-realloc">realloc(p, n)</button>
+ <button class="btn ok" id="hp-free">free(p)</button>
+ <button class="btn" id="hp-null">p = NULL</button>
+ <button class="btn" id="hp-reset">↺ Sıfırla</button>
+ </div>
+ <div class="row">
+ <label>p[ <input type="number" id="hp-i" value="0" style="width:70px"> ] = <input type="number" id="hp-v" value="42" style="width:90px"></label>
+ <button class="btn" id="hp-write"> Yaz</button>
+ <button class="btn" id="hp-fill"> for ile doldur (p[i] = i*10)</button>
+ </div>
+ <div id="hp-msg" class="hmsg">Başlamak için <b>malloc(n)</b>'e bas.</div>
+ <div class="heapwrap">
+ <div class="stackbox">
+ <div class="st-title"> STACK (sıran)</div>
+ <div class="cell ptr" style="width:auto"><div class="ad">&amp;p = 0x7FF0</div><div class="box" id="hp-p">NULL</div><div class="nm">int *p</div></div>
+ <div id="hp-pstate" style="margin-top:8px;font-size:14px"></div>
+ </div>
+ <div>
+ <div class="st-title"> HEAP (depo) — 24 kutu</div>
+ <div class="heap" id="hp-heap"></div>
+ <div class="legend">
+ <span><i style="border-color:#252c55;background:#141933"></i>boş</span>
+ <span><i style="border-color:#22c55e;background:#0f2e20"></i>senin bloğun (p)</span>
+ <span><i style="border-color:#6b7280;border-style:dashed"></i>free edilmiş</span>
+ <span><i style="border-color:#ef4444;background:#2e1015"></i>sızıntı (kimse göstermiyor!)</span>
+ </div>
+ </div>
+ </div>
+ <div class="st-title"> Çalıştırılan kod</div>
+ <div class="hlog" id="hp-log"></div>
+ </div>
+
+ <h3> Doğru kullanım kalıbı</h3>
+ <script type="text/x-c">
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+ int n;
+ printf("Kac sayi gireceksin? ");
+ scanf("%d", &n);
+
+ // 1) KİRALA: n tane int'lik yer (n * 4 bayt)
+ int *dizi = (int*) malloc(n * sizeof(int));
+ // int *dizi = (int*) calloc(n, sizeof(int)); // sıfırlanmış hali
+
+ // 2) KONTROL ET: kiralama başarısız olabilir
+ if (dizi == NULL) {
+ printf("Bellek ayrilamadi!\n");
+ return 1;
+ }
+
+ // 3) KULLAN: normal dizi gibi
+ for (int i = 0; i < n; i++) {
+ scanf("%d", &dizi[i]); // &dizi[i] yerine (dizi + i) de olur
+ }
+
+ // 4) BÜYÜT (gerekirse): güvenli realloc
+ int *yeni = (int*) realloc(dizi, 2 * n * sizeof(int));
+ if (yeni != NULL) dizi = yeni;
+
+ // 5) TESLİM ET ve adresi unut
+ free(dizi);
+ dizi = NULL;
+ return 0;
+}</script>
+ <div class="danger">
+ Uyarı: <b>Dinamik bellekte 5 büyük günah:</b>
+ <ol style="margin:6px 0 0">
+ <li><b>Bellek sızıntısı (memory leak):</b> free etmeyi unutmak ya da adresi kaybetmek. Depo kirası sonsuza kadar işler.</li>
+ <li><b>Sarkan pointer (dangling):</b> free'den sonra p'yi kullanmak. Artık senin olmayan depoya girmek. → free'den sonra <code>p = NULL;</code> yap.</li>
+ <li><b>Double free:</b> Aynı yeri iki kez free etmek. </li>
+ <li><b>Taşma (overflow):</b> 5 kutu kiralayıp <code>p[5]</code>'e yazmak (son geçerli indis 4!).</li>
+ <li><b>NULL kontrolü yapmamak:</b> malloc başarısız olursa NULL'a yazmaya çalışırsın. </li>
+ </ol>
+ </div>
+ <div class="quiz" data-quiz="malloc"></div>
+</section>
+
+<!-- ===================================================== 11. MATRİS -->
+<section id="matris">
+ <h2>11 · Fonksiyonlarla Matrisler <span class="tag">2 BOYUTLU DİZİ</span></h2>
+ <p class="lead">Matris = satırları ve sütunları olan bir tablo. Excel sayfası ya da sinema salonu gibi.</p>
+
+ <div class="analogy">
+ <b>Sinema salonu</b> : Biletinde “<b>3. sıra, 5. koltuk</b>” yazar. C'de bu <code>m[2][4]</code> demek (çünkü C'de saymaya <b>0'dan</b> başlanır!).<br>
+ <ul>
+ <li><code>int m[3][4];</code> → 3 sıra (satır), her sırada 4 koltuk (sütun) = 12 koltuk.</li>
+ <li><code>m[i][j]</code> → i. satır, j. sütun. <b>Önce satır, sonra sütun.</b></li>
+ <li>Bütün salonu gezmek = <b>iç içe döngü</b>: Dış döngü sıraları (i), iç döngü o sıradaki koltukları (j) gezer.</li>
+ </ul>
+ </div>
+ <script type="text/x-c">
+int m[3][4] = { {1, 2, 3, 4},
+ {5, 6, 7, 8},
+ {9, 10, 11, 12} };
+
+for (int i = 0; i < 3; i++) { // her satır için
+ for (int j = 0; j < 4; j++) { // o satırdaki her sütun için
+ printf("%4d", m[i][j]);
+ }
+ printf("\n"); // satır bitti, alt satıra geç
+}</script>
+
+ <h3> Matrisi fonksiyona nasıl gönderirim?</h3>
+ <p>Diziler fonksiyona <b>her zaman adres olarak</b> gider (fotokopi çekilmez!). Yani fonksiyonun içinde matrisi değiştirirsen <code>main</code>'deki matris de değişir. Bu sayede sonucu “return” etmeden doldurabiliriz.</p>
+ <div class="grid2">
+ <div>
+ <b>Yol 1: Sabit boyut (en kolay)</b>
+ <script type="text/x-c">
+#define SUTUN 3
+
+void yazdir(int m[][SUTUN], int satir) {
+ for (int i = 0; i < satir; i++) {
+ for (int j = 0; j < SUTUN; j++)
+ printf("%d ", m[i][j]);
+ printf("\n");
+ }
+}
+// Sütun sayısını YAZMAK ZORUNLU,
+// satır sayısı boş bırakılabilir.</script>
+ </div>
+ <div>
+ <b>Yol 2: Değişken boyut (C99 VLA)</b>
+ <script type="text/x-c">
+void yazdir(int s, int t, int m[s][t]) {
+ for (int i = 0; i < s; i++) {
+ for (int j = 0; j < t; j++)
+ printf("%d ", m[i][j]);
+ printf("\n");
+ }
+}
+// DİKKAT: s ve t, m'den ÖNCE
+// yazılmalı!
+// Çağırma: yazdir(3, 4, m);</script>
+ </div>
+ </div>
+ <div class="warn">Dikkat: <b>Neden sütun sayısı şart?</b> Bellekte matris aslında <b>tek sıra halinde</b> dizilir: önce 0. satır, arkasından 1. satır... <code>m[i][j]</code>'yi bulmak için bilgisayar <code>i * SUTUN + j</code> hesaplar. Sütun sayısını bilmezse kaç kutu atlayacağını bilemez!</div>
+
+ <h3> Matris Laboratuvarı</h3>
+ <p>Matrisleri düzenle (kutulara tıklayıp sayı yazabilirsin), sonra bir işlem seç. Fonksiyonun içindeki iç içe döngüleri adım adım izle.</p>
+ <div class="card">
+ <div class="grid2">
+ <div>
+ <div class="row"><b class="cy">A matrisi</b> <select id="ma-r"></select> × <select id="ma-c"></select></div>
+ <div id="ma-ed"></div>
+ </div>
+ <div>
+ <div class="row"><b class="cy">B matrisi</b> <select id="mb-r"></select> × <select id="mb-c"></select></div>
+ <div id="mb-ed"></div>
+ </div>
+ </div>
+ <div class="row" style="margin-top:12px">
+ <button class="btn" id="mx-rand"> Rastgele doldur</button>
+ <button class="btn primary" data-op="topla">A + B</button>
+ <button class="btn primary" data-op="carp">A × B</button>
+ <button class="btn primary" data-op="transpoz">Aᵀ (transpoz)</button>
+ <button class="btn primary" data-op="kosegen">Köşegen toplamı (A)</button>
+ <button class="btn primary" data-op="satir">Satır toplamları (A)</button>
+ </div>
+ <div id="st-mat"></div>
+ </div>
+ <div class="tip">İpucu: <b>Matris çarpımı kuralı:</b> A'nın <b>sütun</b> sayısı = B'nin <b>satır</b> sayısı olmalı. (2×<b>3</b>) × (<b>3</b>×4) = 2×4. Sonuçtaki her hücre = A'nın bir <b>satırı</b> ile B'nin bir <b>sütununun</b> karşılıklı çarpımlarının toplamı. Bu yüzden <b>3 iç içe döngü</b> gerekir (i, j, k).</div>
+
+ <h3> Dinamik matris: malloc + pointer'a pointer</h3>
+ <div class="analogy">Boyutu çalışırken belli olan bir matris için önce <b>satır adreslerini tutan bir dizi</b> kiralarız (<code>int*</code>'lardan oluşan dizi), sonra her satır için ayrı ayrı yer kiralarız. <code>m</code> → satırların adres listesini gösterir, her <code>m[i]</code> → o satırın kutularını gösterir. Yani <code>int **m</code> = “pointer'ı gösteren pointer”.</div>
+ <div class="card">
+ <div class="row">
+ <label>Satır <input type="range" id="dm-s" min="1" max="5" value="3"> <b id="dm-sv" class="y">3</b></label>
+ <label>Sütun <input type="range" id="dm-t" min="1" max="6" value="4"> <b id="dm-tv" class="y">4</b></label>
+ </div>
+ <div id="dm-viz"></div>
+ <div id="dm-info" class="muted"></div>
+ </div>
+ <script type="text/x-c">
+#include <stdio.h>
+#include <stdlib.h>
+
+// Matris oluşturan fonksiyon: adresini geri döndürür
+int **matrisOlustur(int s, int t) {
+ int **m = (int**) malloc(s * sizeof(int*)); // 1) satır adresleri için yer
+ for (int i = 0; i < s; i++)
+ m[i] = (int*) calloc(t, sizeof(int)); // 2) her satır için yer (0'lı)
+ return m;
+}
+
+void matrisDoldur(int **m, int s, int t) {
+ for (int i = 0; i < s; i++)
+ for (int j = 0; j < t; j++)
+ m[i][j] = i * t + j + 1;
+}
+
+void matrisYazdir(int **m, int s, int t) {
+ for (int i = 0; i < s; i++) {
+ for (int j = 0; j < t; j++)
+ printf("%4d", m[i][j]);
+ printf("\n");
+ }
+}
+
+// Silerken TERS sırada: önce satırlar, sonra satır listesi
+void matrisSil(int **m, int s) {
+ for (int i = 0; i < s; i++)
+ free(m[i]);
+ free(m);
+}
+
+int main() {
+ int s, t;
+ printf("Satir ve sutun: ");
+ scanf("%d %d", &s, &t);
+
+ int **m = matrisOlustur(s, t);
+ matrisDoldur(m, s, t);
+ matrisYazdir(m, s, t);
+ matrisSil(m, s);
+ m = NULL;
+ return 0;
+}</script>
+ <div class="warn">Dikkat: <b>Silme sırası önemli!</b> Önce <code>free(m)</code> yaparsan satırların adreslerinin yazılı olduğu listeyi yakmış olursun; satırları artık bulamazsın → bellek sızıntısı. <b>Önce çocuklar (satırlar), sonra ebeveyn (liste).</b></div>
+ <div class="quiz" data-quiz="matris"></div>
+</section>
+
+<!-- ===================================================== ÖZET -->
+<section id="ozet">
+ <h2> Kopya Kağıdı <span class="tag">SINAVDAN ÖNCE OKU</span></h2>
+ <table class="t">
+ <tr><th>Konu</th><th>Tek cümlede</th><th>Kilit kod</th></tr>
+ <tr><td>Basamak alma</td><td>Son rakamı al, sonra at; sayı 0 olana dek tekrarla</td><td><code>b = n % 10; n = n / 10;</code></td></tr>
+ <tr><td>Armstrong</td><td>Rakamların (basamak sayısı). kuvvetleri toplamı = sayı</td><td><code>toplam += pow(b, n);</code></td></tr>
+ <tr><td>Palindrom</td><td>Tersi kendisine eşit</td><td><code>ters = ters * 10 + b;</code></td></tr>
+ <tr><td>Harshad</td><td>Rakam toplamına tam bölünür</td><td><code>sayi % toplam == 0</code></td></tr>
+ <tr><td>Casus</td><td>Rakam toplamı = rakam çarpımı</td><td><code>carpim = 1</code> ile başla!</td></tr>
+ <tr><td>Mutlu</td><td>Rakam kareleri toplamını tekrarla, 1'e varırsa mutlu</td><td><code>while (n != 1 &amp;&amp; n != 4)</code></td></tr>
+ <tr><td>İç içe döngü</td><td>Dış 1 adım = iç baştan sona tam tur</td><td>Toplam = dış × iç</td></tr>
+ <tr><td>math.h</td><td>Hazır fonksiyonlar, double döndürür</td><td><code>gcc kod.c -lm</code>, <code>%f</code></td></tr>
+ <tr><td>Pointer</td><td>Adres tutan değişken</td><td><code>int *p = &amp;a; *p = 10;</code></td></tr>
+ <tr><td>malloc/calloc</td><td>Heap'ten yer kirala; calloc sıfırlar</td><td><code>malloc(n*sizeof(int))</code> / <code>calloc(n, sizeof(int))</code></td></tr>
+ <tr><td>free</td><td>Kirayı bitir, sonra adresi unut</td><td><code>free(p); p = NULL;</code></td></tr>
+ <tr><td>Matris</td><td>m[satır][sütun], iç içe döngüyle gez, fonksiyona adres olarak gider</td><td><code>void f(int s, int t, int m[s][t])</code></td></tr>
+ </table>
+ <div class="tip"> Tebrikler! Buraya kadar geldiysen artık bu konuları birine <b>sen</b> anlatabilirsin. En iyi öğrenme yolu: Her örneği kendi bilgisayarında <b>sıfırdan</b>, bakmadan yazmayı dene.</div>
+</section>
+
+<footer>Sadece HTML + CSS + JavaScript ile yapıldı · Tek dosya · GitHub Pages'e hazır </footer>
+</main>
+
+<script>
+/* =====================================================================
+ YARDIMCILAR
+ ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const fmtTR = x => String(x).replace('.', ',');
+const hex = n => '0x' + n.toString(16).toUpperCase();
+
+const C_TYPES = new Set(['int', 'double', 'float', 'char', 'void', 'long', 'short', 'unsigned', 'signed', 'const', 'struct', 'size_t']);
+const C_KW = new Set(['return', 'if', 'else', 'while', 'for', 'do', 'break', 'continue', 'sizeof', 'NULL', 'switch', 'case', 'default']);
+const C_FN = new Set(['printf', 'scanf', 'malloc', 'calloc', 'realloc', 'free', 'pow', 'sqrt', 'cbrt', 'fabs', 'abs', 'ceil', 'floor', 'round', 'fmod', 'log10', 'log', 'exp', 'sin', 'cos', 'main']);
+
+function hlLine(line) {
+ const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(#\s*[a-z]+)|\b([A-Za-z_]\w*)\b|\b(\d+(?:\.\d+)?)\b/g;
+ let out = '', last = 0, m;
+ while ((m = re.exec(line))) {
+ out += esc(line.slice(last, m.index));
+ const t = m[0];
+ if (m[1]) out += `<span class="c-com">${esc(t)}</span>`;
+ else if (m[2]) out += `<span class="c-str">${esc(t)}</span>`;
+ else if (m[3]) out += `<span class="c-pre">${esc(t)}</span>`;
+ else if (m[4]) {
+ if (C_TYPES.has(t)) out += `<span class="c-ty">${t}</span>`;
+ else if (C_KW.has(t)) out += `<span class="c-kw">${t}</span>`;
+ else if (C_FN.has(t)) out += `<span class="c-fn">${t}</span>`;
+ else out += esc(t);
+ } else if (m[5]) out += `<span class="c-num">${t}</span>`;
+ last = re.lastIndex;
+ }
+ return out + esc(line.slice(last));
+}
+const hlCode = code => code.split('\n').map(hlLine).join('\n');
+
+// <script type="text/x-c"> bloklarını renkli kod kutusuna çevir
+$$('script[type="text/x-c"]').forEach(s => {
+ const pre = document.createElement('pre');
+ pre.className = 'code';
+ pre.innerHTML = hlCode(s.textContent.replace(/^\n/, '').replace(/\s+$/, ''));
+ s.replaceWith(pre);
+});
+
+// adım kaydedici
+function rec() {
+ const steps = []; let out = '';
+ return {
+ steps,
+ print(s) { out += s; },
+ push(line, vars, msg, extra = {}) { steps.push(Object.assign({ line, vars: { ...vars }, msg, out }, extra)); }
+ };
+}
+
+/* =====================================================================
+ GENEL ADIM ADIM OYNATICI (STEPPER)
+ ===================================================================== */
+const ALL_ST = [];
+function createStepper(id, opts) {
+ const root = document.getElementById(id);
+ root.classList.add('stepper');
+ const inp = opts.input;
+ root.innerHTML = `
+ ${inp ? `<div class="st-input">
+ <label>${inp.label} <input type="number" class="st-in" value="${inp.value}"></label>
+ <button class="btn primary st-go"> Başlat</button>
+ ${inp.examples ? '<span class="ex-l">Dene:</span>' + inp.examples.map(e => `<button class="chip" data-v="${e}">${e}</button>`).join('') : ''}
+ </div>` : ''}
+ <div class="st-ctrl">
+ <button class="btn st-first" title="Başa dön">⏮</button>
+ <button class="btn st-prev">◀ Geri</button>
+ <button class="btn primary st-play">▶ Oynat</button>
+ <button class="btn st-next">İleri ▶</button>
+ <button class="btn st-last" title="Sona git">⏭</button>
+ <label class="speed">Yavaş <input type="range" min="1" max="10" value="5" class="st-speed"> Hızlı</label>
+ <span class="st-count"></span>
+ </div>
+ <div class="st-msg"></div>
+ <div class="st-body">
+ <div class="st-left"><div class="st-title"> Kod <small>(sarı satır = şu an çalışan satır)</small></div><div class="st-code"></div></div>
+ <div class="st-right">
+ <div class="st-title"> Görsel</div><div class="st-viz"></div>
+ <div class="st-title" style="margin-top:10px"> Değişkenler <small>(sarı = az önce değişti)</small></div><div class="st-vars"></div>
+ <div class="st-title"> Ekran çıktısı</div><pre class="st-out"></pre>
+ </div>
+ </div>`;
+ const q = s => root.querySelector(s);
+ const st = { steps: [], i: 0, timer: null, lines: [] };
+
+ function setCode(code) {
+ const el = q('.st-code');
+ el.innerHTML = code.split('\n').map((l, k) => `<div class="ln"><span class="no">${k + 1}</span><span class="tx">${hlLine(l) || ' '}</span></div>`).join('');
+ st.lines = [...el.children];
+ }
+ function show(i) {
+ if (!st.steps.length) return;
+ st.i = Math.max(0, Math.min(i, st.steps.length - 1));
+ const s = st.steps[st.i], p = st.steps[st.i - 1];
+ const act = Array.isArray(s.line) ? s.line : [s.line];
+ st.lines.forEach((el, k) => el.classList.toggle('active', act.includes(k + 1)));
+ q('.st-msg').innerHTML = s.msg;
+ q('.st-vars').innerHTML = Object.entries(s.vars).map(([k, v]) => {
+ const ch = st.i > 0 && (!p || !(k in p.vars) || p.vars[k] !== v);
+ return `<span class="var ${ch ? 'chg' : ''}">${esc(k)} = <b>${esc(v)}</b></span>`;
+ }).join('') || '<span class="muted">—</span>';
+ q('.st-out').textContent = s.out || '';
+ q('.st-count').textContent = `Adım ${st.i + 1} / ${st.steps.length}`;
+ if (opts.render) opts.render(s, q('.st-viz'), p);
+ }
+ const delay = () => 2000 - q('.st-speed').value * 185;
+ function stop() { clearInterval(st.timer); st.timer = null; q('.st-play').textContent = '▶ Oynat'; }
+ function startTimer() {
+ clearInterval(st.timer);
+ st.timer = setInterval(() => { if (st.i >= st.steps.length - 1) { stop(); return; } show(st.i + 1); }, delay());
+ }
+ function play() {
+ if (st.timer) { stop(); return; }
+ if (st.i >= st.steps.length - 1) show(0);
+ q('.st-play').textContent = '⏸ Durdur';
+ startTimer();
+ }
+ q('.st-play').onclick = play;
+ q('.st-next').onclick = () => { stop(); show(st.i + 1); };
+ q('.st-prev').onclick = () => { stop(); show(st.i - 1); };
+ q('.st-first').onclick = () => { stop(); show(0); };
+ q('.st-last').onclick = () => { stop(); show(st.steps.length - 1); };
+ q('.st-speed').oninput = () => { if (st.timer) startTimer(); };
+
+ function load(steps, code) { stop(); if (code) setCode(code); st.steps = steps; show(0); }
+ function error(msg) { stop(); q('.st-msg').innerHTML = `<span class="bad">Dikkat: ${msg}</span>`; }
+
+ if (opts.code) setCode(opts.code);
+ if (inp) {
+ const go = () => {
+ const v = Number(q('.st-in').value);
+ const r = opts.build(v);
+ if (r.error) error(r.error); else load(r.steps, r.code);
+ };
+ q('.st-go').onclick = go;
+ q('.st-in').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+ $$('.chip', root).forEach(c => c.onclick = () => { q('.st-in').value = c.dataset.v; go(); });
+ go();
+ }
+ const api = { load, error, setCode, rerender: () => show(st.i) };
+ ALL_ST.push(api);
+ return api;
+}
+
+/* ortak görseller */
+function digitsViz(orig, taken, focus, cls = '') {
+ const s = String(orig); let h = '<div class="digits">';
+ for (let k = 0; k < s.length; k++) {
+ const fr = s.length - 1 - k;
+ let c = 'dg ' + cls;
+ if (fr < taken) c += ' taken'; else if (focus && fr === taken) c += ' focus';
+ h += `<div class="${c}">${s[k]}</div>`;
+ }
+ return h + '</div>';
+}
+function groupsViz(total, size, cap = 240) {
+ if (size <= 0 || total > cap) return '';
+ const full = Math.floor(total / size), rest = total % size;
+ let h = '<div class="groups">';
+ for (let g = 0; g < full; g++) h += '<div class="grp-box">' + '<span class="dot"></span>'.repeat(size) + '</div>';
+ if (rest) h += '<div class="grp-box" style="border-color:#ef4444">' + '<span class="dot rest"></span>'.repeat(rest) + '</div>';
+ return h + '</div>';
+}
+const isInt = (n, a, b) => Number.isInteger(n) && n >= a && n <= b;
+
+/* =====================================================================
+ 1. BASAMAK ALMA
+ ===================================================================== */
+function divmodToy() {
+ const a = parseInt($('#dm-a').value), b = parseInt($('#dm-b').value);
+ const o = $('#dm-out');
+ if (isNaN(a) || isNaN(b)) { o.innerHTML = ''; return; }
+ if (b === 0) { o.innerHTML = '<p class="bad">0\'a bölme yapılamaz! Program çöker </p>'; return; }
+ if (a < 0 || b < 0) { o.innerHTML = '<p class="muted">Şimdilik pozitif sayılarla dene </p>'; return; }
+ const d = Math.trunc(a / b), r = a % b;
+ o.innerHTML = `<div class="eq" style="text-align:left">
+ <code>${a} / ${b}</code> = <b class="cy">${d}</b> <span class="muted">(gerçekte ${fmtTR(+(a / b).toFixed(3))}, küsurat atıldı)</span><br>
+ <code>${a} % ${b}</code> = <b class="bad">${r}</b> <span class="muted">(artan)</span></div>
+ <p style="margin:4px 0">${a} tane topu ${b}'erli kutulara koy: <b class="cy">${d}</b> dolu kutu, <b class="bad">${r}</b> top açıkta kalır.</p>
+ ${groupsViz(a, b) || '<p class="muted">(Görsel için 240\'tan küçük sayılar dene)</p>'}
+ ${b === 10 ? `<p class="y"> 10'a bölünce kalan (${r}) = sayının son rakamı! Bölüm (${d}) = son rakamı atılmış hali!</p>` : `<p class="muted">İpucu: b'yi <b>10</b> yap ve ne olduğuna bak.</p>`}`;
+}
+$('#dm-a').oninput = divmodToy; $('#dm-b').oninput = divmodToy; divmodToy();
+
+function buildBasamak(n) {
+ if (!isInt(n, 1, 9999999)) return { error: '1 ile 9.999.999 arasında pozitif bir tam sayı gir.' };
+ const code = String.raw`int n = ${n};
+while (n > 0) {
+ int basamak = n % 10; // son rakamı kopar
+ printf("%d\n", basamak);
+ n = n / 10; // son rakamı at
+}`;
+ const R = rec(); let v = { n }; let taken = 0; const got = [];
+ const X = (f = false) => ({ taken, focus: f, got: [...got], orig: n });
+ R.push(1, v, `<b>n</b> adında bir kutu açtık, içine <b>${n}</b> koyduk. Hedef: rakamlarını <u>sağdan sola</u> tek tek koparmak. `, X());
+ while (true) {
+ if (v.n > 0) {
+ R.push(2, v, `Kontrol: <b>${v.n} > 0</b> mı? <span class="ok">Evet (Doğru)</span> → Hâlâ rakam var, döngünün içine gir.`, X(true));
+ const b = v.n % 10; v = { ...v, basamak: b };
+ R.push(3, v, `<b>${v.n} % 10 = ${b}</b><br>% demek “bölümden <u>kalanı</u> ver”. ${v.n} lirayı 10'luk banknotlara bozdur: ${Math.floor(v.n / 10)} tane 10'luk olur, cebinde <b>${b} lira bozukluk</b> kalır. İşte o bozukluk = son rakam! 🪙`, X(true));
+ R.print(b + '\n');
+ R.push(4, v, `Koparılan rakamı (<b>${b}</b>) ekrana yazdırdık. `, X(true));
+ const old = v.n, nn = Math.floor(old / 10); v = { ...v, n: nn }; taken++; got.push(b);
+ R.push(5, v, `<b>${old} / 10 = ${nn}</b><br>Tam sayı bölmesi virgülden sonrasını <u>çöpe atar</u> (${fmtTR(old / 10)} değil, ${nn}). Yani son rakamı kesip attık. `, X());
+ } else {
+ R.push(2, v, `Kontrol: <b>0 > 0</b> mı? <span class="bad">Hayır (Yanlış)</span> → Döngü biter. Bütün rakamları kopardık: <b>${got.join(', ')}</b> <br>Dikkat: rakamlar <u>sondan başa</u> doğru geldi!`, X());
+ break;
+ }
+ }
+ return { steps: R.steps, code };
+}
+createStepper('st-basamak', {
+ input: { label: 'Sayı:', value: 153, examples: [153, 4728, 90210, 7] },
+ build: buildBasamak,
+ render(s, viz) {
+ viz.innerHTML = `<div class="vlabel">Sayının rakamları (tren vagonları)</div>${digitsViz(s.orig, s.taken, s.focus)}
+ <div class="vlabel">Koparılan rakamlar </div><div class="digits">${s.got.map(d => `<div class="dg new small">${d}</div>`).join('') || '<span class="muted">henüz yok</span>'}</div>`;
+ }
+});
+
+/* =====================================================================
+ 2. ARMSTRONG
+ ===================================================================== */
+function buildArmstrong(sayi) {
+ if (!isInt(sayi, 1, 99999)) return { error: 'Lütfen 1 ile 99999 arasında bir tam sayı giriniz.' };
+ const code = String.raw`int sayi = ${sayi};
+int gecici_sayi = sayi;
+int basamak_sayisi = 0;
+int toplam = 0;
+
+// 1. ADIM: Basamak sayısını bul
+while (gecici_sayi > 0) {
+ basamak_sayisi++;
+ gecici_sayi = gecici_sayi / 10;
+}
+
+// 2. ADIM: Her basamağın kuvvetini hesaplayıp topla
+gecici_sayi = sayi;
+while (gecici_sayi > 0) {
+ int basamak = gecici_sayi % 10;
+ int kuvvet = 1;
+ for (int i = 0; i < basamak_sayisi; i++) {
+ kuvvet = kuvvet * basamak;
+ }
+ toplam = toplam + kuvvet;
+ gecici_sayi = gecici_sayi / 10;
+}
+
+// 3. ADIM: Karşılaştır
+if (toplam == sayi)
+ printf("%d bir Armstrong sayisidir!\n", sayi);
+else
+ printf("%d Armstrong sayisi degildir.\n", sayi);`;
+ const R = rec(); let v = { sayi };
+ const ex = { phase: 1, taken: 0, terms: [], pw: null };
+ const E = (o = {}) => ({ ...ex, terms: ex.terms.map(t => ({ ...t })), pw: ex.pw ? { ...ex.pw, muls: [...ex.pw.muls] } : null, focus: false, ...o });
+ R.push(1, v, `İncelenecek sayı: <b>${sayi}</b>.`, E());
+ v = { ...v, gecici_sayi: sayi, basamak_sayisi: 0, toplam: 0 };
+ R.push(2, v, `<b>gecici_sayi</b> = sayının kopyası (döngüde bölündükçe tükenecek, orijinal <b>sayi</b> korunur).<br><b>basamak_sayisi = 0</b> ve <b>toplam = 0</b> olarak başlatıldı.`, E());
+ while (true) {
+ if (v.gecici_sayi > 0) {
+ R.push(7, v, `<b>${v.gecici_sayi} > 0</b> (Döngü devam ediyor).`, E({ focus: true }));
+ v = { ...v, basamak_sayisi: v.basamak_sayisi + 1 };
+ R.push(8, v, `Bir basamak sayıldı: <b>basamak_sayisi = ${v.basamak_sayisi}</b>`, E({ focus: true }));
+ const old = v.gecici_sayi; v = { ...v, gecici_sayi: Math.floor(old / 10) }; ex.taken++;
+ R.push(9, v, `${old} / 10 = <b>${v.gecici_sayi}</b> (Son basamak atıldı).`, E());
+ } else {
+ R.push(7, v, `<b>gecici_sayi = 0</b> oldu, basamak sayma döngüsü bitti.<br>Toplam basamak sayısı: <b>${v.basamak_sayisi}</b>. Her basamağın <b>${v.basamak_sayisi}. kuvveti</b> alınacak.`, E());
+ break;
+ }
+ }
+ ex.phase = 2; ex.taken = 0;
+ v = { ...v, gecici_sayi: sayi };
+ R.push(13, v, `Kuvvet hesaplama için <b>gecici_sayi</b> tekrar orijinal sayıya (${sayi}) eşitlendi.`, E());
+ while (true) {
+ if (v.gecici_sayi > 0) {
+ R.push(14, v, `<b>${v.gecici_sayi} > 0</b> (Sıradaki basamak işlenecek).`, E({ focus: true }));
+ const basamak = v.gecici_sayi % 10; v = { ...v, basamak };
+ R.push(15, v, `${v.gecici_sayi} % 10 = <b>${basamak}</b> (Son basamak alındı).`, E({ focus: true }));
+ v = { ...v, kuvvet: 1 }; ex.pw = { basamak, basamak_sayisi: v.basamak_sayisi, muls: [] };
+ R.push(16, v, `<b>kuvvet = 1</b> olarak başlatıldı (Çarpma işleminde etkisiz eleman 1'dir).`, E({ focus: true }));
+ for (let i = 0; ; i++) {
+ v = { ...v, i };
+ if (i < v.basamak_sayisi) {
+ R.push(17, v, `İç döngü (kuvvet adımı ${i + 1}): i = ${i} < ${v.basamak_sayisi} (Çarpma yapılacak).`, E({ focus: true }));
+ const prev = v.kuvvet, k = prev * basamak; v = { ...v, kuvvet: k }; ex.pw.muls.push(basamak);
+ R.push(18, v, `kuvvet = ${prev} × ${basamak} = <b>${k}</b>`, E({ focus: true }));
+ } else {
+ R.push(17, v, `i = ${i} (İç döngü bitti). <b>${basamak}<sup>${v.basamak_sayisi}</sup> = ${v.kuvvet}</b> elde edildi.`, E({ focus: true }));
+ break;
+ }
+ }
+ const { i: _drop, ...rest } = v; v = rest;
+ const old = v.toplam; v = { ...v, toplam: old + v.kuvvet }; ex.terms.push({ basamak, basamak_sayisi: v.basamak_sayisi, val: v.kuvvet }); ex.pw = null;
+ R.push(20, v, `Toplam havuzuna eklendi: toplam = ${old} + ${v.kuvvet} = <b>${v.toplam}</b>`, E({ focus: true }));
+ const ot = v.gecici_sayi; v = { ...v, gecici_sayi: Math.floor(ot / 10) }; ex.taken++;
+ R.push(21, v, `${ot} / 10 = <b>${v.gecici_sayi}</b> (İşlenen basamak atıldı).`, E());
+ } else {
+ R.push(14, v, `gecici_sayi = 0 oldu, tüm basamaklar tamamlandı. Elde edilen toplam: <b>${v.toplam}</b>.`, E());
+ break;
+ }
+ }
+ const ok = v.toplam === sayi;
+ R.push(25, v, `Karşılaştırma: <b>${v.toplam} == ${sayi}</b> mi? ${ok ? '<span class="ok">Evet, eşit.</span>' : '<span class="bad">Hayır, eşit değil.</span>'}`, E({ final: true, ok }));
+ if (ok) { R.print(`${sayi} bir Armstrong sayisidir!\n`); R.push(26, v, `Sonuç: <b>${sayi}</b> bir Armstrong sayısıdır. Basamaklarının kuvvetleri toplamı kendisine eşittir.`, E({ final: true, ok })); }
+ else { R.print(`${sayi} Armstrong sayisi degildir.\n`); R.push(28, v, `Sonuç: <b>${sayi}</b> Armstrong sayısı değildir. Basamakların kuvvetleri toplamı ${v.toplam} çıkmıştır.`, E({ final: true, ok })); }
+ return { steps: R.steps, code };
+}
+createStepper('st-armstrong', {
+ input: { label: 'Sayı:', value: 153, examples: [153, 370, 371, 407, 1634, 9474, 123, 100] },
+ build: buildArmstrong,
+ render(s, viz) {
+ let h = `<div class="vlabel">${s.phase === 1 ? '1. Adım: Basamak Sayısını Bulma' : '2. Adım: Basamak Kuvvetlerini Toplama'}</div>` + digitsViz(s.vars.sayi, s.taken, s.focus);
+ if (s.pw) h += `<div class="eq">${s.pw.basamak}<sup>${s.pw.basamak_sayisi}</sup>: kuvvet = 1${s.pw.muls.map(m => ' × ' + m).join('')} = <b class="y">${s.vars.kuvvet}</b></div>`;
+ if (s.terms.length) {
+ const sum = s.terms.reduce((a, t) => a + t.val, 0);
+ h += `<div class="eq">Toplam = ${s.terms.map(t => `${t.basamak}<sup>${t.basamak_sayisi}</sup>`).join(' + ')}<br>= ${s.terms.map(t => t.val).join(' + ')} = <b class="cy">${sum}</b></div>`;
+ }
+ if (s.final) h += `<div class="result ${s.ok ? 'yes' : 'no'}">${s.vars.toplam} ${s.ok ? '==' : '≠'} ${s.vars.sayi} → ${s.ok ? 'ARMSTRONG SAYISIDIR' : 'ARMSTRONG SAYISI DEĞİLDİR'}</div>`;
+ viz.innerHTML = h;
+ }
+});
+
+/* =====================================================================
+ 3. PALİNDROM
+ ===================================================================== */
+function buildPalindrom(sayi) {
+ if (!isInt(sayi, 1, 99999999)) return { error: '1 ile 99.999.999 arasında bir sayı gir.' };
+ const code = String.raw`int sayi = ${sayi};
+int gecici_sayi = sayi, ters_sayi = 0;
+
+while (gecici_sayi > 0) {
+ int basamak = gecici_sayi % 10; // son basamağı al
+ ters_sayi = ters_sayi * 10 + basamak; // basamağı ters sayının sağına ekle
+ gecici_sayi = gecici_sayi / 10; // son basamağı at
+}
+
+if (ters == sayi)
+ printf("%d palindromdur!\n", sayi);
+else
+ printf("%d palindrom degil.\n", sayi);`;
+ const R = rec(); let v = { sayi }; let taken = 0;
+ const X = (o = {}) => ({ taken, focus: false, newLast: false, ...o });
+ R.push(1, v, `Kontrol edeceğimiz sayı: <b>${sayi}</b>.`, X());
+ v = { ...v, temp: sayi, ters: 0 };
+ R.push(2, v, `<b>temp</b> = fotokopi (yiyip bitireceğiz). <b>ters</b> = 0 → sayının tersini burada <u>inşa edeceğiz</u> `, X());
+ while (true) {
+ if (v.temp > 0) {
+ R.push(4, v, `<b>${v.temp} > 0</b> (Doğru) Devam.`, X({ focus: true }));
+ const b = v.temp % 10; v = { ...v, b };
+ R.push(5, v, `${v.temp} % 10 = <b>${b}</b> → Son rakamı kopardık.`, X({ focus: true }));
+ const old = v.ters, nt = old * 10 + b; v = { ...v, ters: nt };
+ R.push(6, v, `ters = ${old} × 10 + ${b} = ${old * 10} + ${b} = <b>${nt}</b><br> <b>×10</b>: mevcut rakamları bir sola kaydır, sağda boş yer aç (${old} → ${old * 10}). <b>+${b}</b>: o boşluğa yeni rakamı koy.`, X({ focus: true, newLast: true }));
+ const ot = v.temp; v = { ...v, temp: Math.floor(ot / 10) }; taken++;
+ R.push(7, v, `${ot} / 10 = <b>${v.temp}</b> → Kullandığımız rakamı attık.`, X());
+ } else {
+ R.push(4, v, `temp = 0 (Yanlış) → Döngü bitti. Sayının tersi: <b>${v.ters}</b>`, X());
+ break;
+ }
+ }
+ const ok = v.ters === sayi;
+ R.push(10, v, `<b>${v.ters} == ${sayi}</b> mı? ${ok ? '<span class="ok">EVET (Doğru)</span>' : '<span class="bad">HAYIR (Yanlış)</span>'}`, X({ final: true, ok }));
+ if (ok) { R.print(`${sayi} palindromdur!\n`); R.push(11, v, ` <b>${sayi}</b> tersten de aynı okunuyor: palindrom!`, X({ final: true, ok })); }
+ else { R.print(`${sayi} palindrom degil.\n`); R.push(13, v, ` Tersi ${v.ters}, kendisi ${sayi}. Palindrom değil.`, X({ final: true, ok })); }
+ return { steps: R.steps, code };
+}
+createStepper('st-palindrom', {
+ input: { label: 'Sayı:', value: 12321, examples: [121, 12321, 1221, 123, 1001, 120] },
+ build: buildPalindrom,
+ render(s, viz) {
+ const t = String(s.vars.ters);
+ let h = `<div class="vlabel">temp (yeniyor )</div>${digitsViz(s.vars.sayi, s.taken, s.focus)}
+ <div class="vlabel">ters (inşa ediliyor )</div><div class="digits">`;
+ if (s.vars.ters === 0 && s.taken === 0 && !s.newLast) h += '<span class="muted">boş (0)</span>';
+ else for (let k = 0; k < t.length; k++) h += `<div class="dg ${s.newLast && k === t.length - 1 ? 'new' : ''}">${t[k]}</div>`;
+ h += '</div>';
+ if (s.final) h += `<div class="result ${s.ok ? 'yes' : 'no'}">${s.vars.ters} ${s.ok ? '==' : '≠'} ${s.vars.sayi} → ${s.ok ? 'PALİNDROM (Doğru)' : 'PALİNDROM DEĞİL (Yanlış)'}</div>`;
+ viz.innerHTML = h;
+ }
+});
+
+/* =====================================================================
+ 4. HARSHAD
+ ===================================================================== */
+function buildHarshad(sayi) {
+ if (!isInt(sayi, 1, 9999999)) return { error: '1 ile 9.999.999 arasında bir sayı gir.' };
+ const code = String.raw`int sayi = ${sayi};
+int gecici_sayi = sayi, basamak_toplami = 0;
+
+while (gecici_sayi > 0) {
+ int basamak = gecici_sayi % 10; // son basamağı al
+ basamak_toplami = basamak_toplami + basamak; // toplama ekle
+ gecici_sayi = gecici_sayi / 10; // son basamağı at
+}
+
+if (sayi % toplam == 0) // kalan 0 mı? = tam bölünüyor mu?
+ printf("%d bir Harshad sayisidir!\n", sayi);
+else
+ printf("%d Harshad degil.\n", sayi);`;
+ const R = rec(); let v = { sayi }; let taken = 0; const ds = [];
+ const X = (o = {}) => ({ taken, focus: false, ds: [...ds], ...o });
+ R.push(1, v, `Elimizde <b>${sayi}</b> şeker var .`, X());
+ v = { ...v, temp: sayi, toplam: 0 };
+ R.push(2, v, `temp = fotokopi, <b>toplam = 0</b> (toplama kumbarası 0'dan başlar).`, X());
+ while (true) {
+ if (v.temp > 0) {
+ R.push(4, v, `<b>${v.temp} > 0</b> (Doğru)`, X({ focus: true }));
+ const b = v.temp % 10, old = v.toplam; v = { ...v, toplam: old + b }; ds.push(b);
+ R.push(5, v, `${v.temp} % 10 = ${b} → toplam = ${old} + ${b} = <b>${v.toplam}</b>`, X({ focus: true }));
+ const ot = v.temp; v = { ...v, temp: Math.floor(ot / 10) }; taken++;
+ R.push(6, v, `${ot} / 10 = <b>${v.temp}</b> → rakamı attık.`, X());
+ } else {
+ R.push(4, v, `temp = 0 (Yanlış) → Rakamlar toplamı = <b>${v.toplam}</b>. Yani <b>${v.toplam} arkadaşımız</b> var .`, X());
+ break;
+ }
+ }
+ const r = sayi % v.toplam, ok = r === 0;
+ R.push(9, v, `<b>${sayi} % ${v.toplam} = ${r}</b>. ${sayi} şekeri ${v.toplam} arkadaşa dağıt: herkese ${Math.floor(sayi / v.toplam)} şeker düşer, <b>${r}</b> şeker artar. ${ok ? '<span class="ok">Hiç artmadı → tam bölünüyor (Doğru)</span>' : '<span class="bad">Artan var → tam bölünmüyor (Yanlış)</span>'}`, X({ final: true, ok, r }));
+ if (ok) { R.print(`${sayi} bir Harshad sayisidir!\n`); R.push(10, v, ` <b>${sayi}</b> bir Harshad sayısı!`, X({ final: true, ok, r })); }
+ else { R.print(`${sayi} Harshad degil.\n`); R.push(12, v, ` <b>${sayi}</b> Harshad değil.`, X({ final: true, ok, r })); }
+ return { steps: R.steps, code };
+}
+createStepper('st-harshad', {
+ input: { label: 'Sayı:', value: 18, examples: [18, 21, 19, 156, 1729, 100, 13] },
+ build: buildHarshad,
+ render(s, viz) {
+ let h = digitsViz(s.vars.sayi, s.taken, s.focus);
+ if (s.ds.length) h += `<div class="eq">toplam = ${s.ds.join(' + ')} = <b class="cy">${s.vars.toplam}</b></div>`;
+ if (s.final) {
+ const g = groupsViz(s.vars.sayi, s.vars.toplam);
+ h += `<div class="eq">${s.vars.sayi} şeker ÷ ${s.vars.toplam} kişi → her turda herkese 1'er şeker:</div>${g || '<p class="muted" style="text-align:center">(sayı büyük olduğu için şeker çizilmedi)</p>'}`;
+ h += `<div class="result ${s.ok ? 'yes' : 'no'}">${s.vars.sayi} % ${s.vars.toplam} = ${s.r} → ${s.ok ? 'HARSHAD (Doğru)' : 'HARSHAD DEĞİL (Yanlış)'}</div>`;
+ }
+ viz.innerHTML = h;
+ }
+});
+
+/* =====================================================================
+ 5. CASUS
+ ===================================================================== */
+function buildCasus(sayi) {
+ if (!isInt(sayi, 1, 9999999)) return { error: '1 ile 9.999.999 arasında bir sayı gir.' };
+ const code = String.raw`int sayi = ${sayi};
+int gecici_sayi = sayi, toplam = 0, carpim = 1;
+
+while (gecici_sayi > 0) {
+ int basamak = gecici_sayi % 10; // son basamağı al
+ toplam = toplam + basamak; // toplam havuzuna ekle
+ carpim = carpim * basamak; // çarpım havuzuna ekle
+ gecici_sayi = gecici_sayi / 10; // son basamağı at
+}
+
+if (toplam == carpim)
+ printf("%d bir casus sayidir!\n", sayi);
+else
+ printf("%d casus degil.\n", sayi);`;
+ const R = rec(); let v = { sayi }; let taken = 0; const ds = [];
+ const X = (o = {}) => ({ taken, focus: false, ds: [...ds], ...o });
+ R.push(1, v, `Şüpheli sayı: <b>${sayi}</b> `, X());
+ v = { ...v, temp: sayi, toplam: 0, carpim: 1 };
+ R.push(2, v, `<b>toplam = 0</b> ama <b>carpim = 1</b>! Neden? 0'ı neyle çarparsan 0 olur; çarpma kumbarası 0'dan başlarsa sonsuza kadar 0 kalır. 1 ise çarpmada etkisizdir.`, X());
+ while (true) {
+ if (v.temp > 0) {
+ R.push(4, v, `<b>${v.temp} > 0</b> (Doğru)`, X({ focus: true }));
+ const b = v.temp % 10; v = { ...v, b };
+ R.push(5, v, `${v.temp} % 10 = <b>${b}</b>`, X({ focus: true }));
+ const ot = v.toplam; v = { ...v, toplam: ot + b }; ds.push(b);
+ R.push(6, v, `toplam = ${ot} + ${b} = <b>${v.toplam}</b>`, X({ focus: true }));
+ const oc = v.carpim; v = { ...v, carpim: oc * b };
+ R.push(7, v, `carpim = ${oc} × ${b} = <b>${v.carpim}</b>${b === 0 ? ' (0 geldi, çarpım artık hep 0!)' : ''}`, X({ focus: true }));
+ const tt = v.temp; v = { ...v, temp: Math.floor(tt / 10) }; taken++;
+ R.push(8, v, `${tt} / 10 = <b>${v.temp}</b>`, X());
+ } else {
+ R.push(4, v, `temp = 0 (Yanlış) → Döngü bitti. Teraziye koyalım `, X());
+ break;
+ }
+ }
+ const ok = v.toplam === v.carpim;
+ R.push(11, v, `<b>${v.toplam} == ${v.carpim}</b> mı? ${ok ? '<span class="ok">EVET, terazi dengede (Doğru)</span>' : '<span class="bad">HAYIR, terazi dengesiz (Yanlış)</span>'}`, X({ final: true, ok }));
+ if (ok) { R.print(`${sayi} bir casus sayidir!\n`); R.push(12, v, ` Yakaladık! <b>${sayi}</b> bir casus sayı!`, X({ final: true, ok })); }
+ else { R.print(`${sayi} casus degil.\n`); R.push(14, v, ` <b>${sayi}</b> masum, casus değil.`, X({ final: true, ok })); }
+ return { steps: R.steps, code };
+}
+createStepper('st-casus', {
+ input: { label: 'Sayı:', value: 1124, examples: [1124, 123, 22, 1412, 132, 135, 105] },
+ build: buildCasus,
+ render(s, viz) {
+ const t = s.vars.toplam ?? 0, c = s.vars.carpim ?? 1;
+ const ang = t === c ? 0 : (t > c ? -9 : 9);
+ let h = digitsViz(s.vars.sayi, s.taken, s.focus);
+ h += `<div class="eq"> toplam = ${s.ds.length ? s.ds.join(' + ') : '0'} = <b class="cy">${t}</b><br> carpim = ${s.ds.length ? '1 × ' + s.ds.join(' × ') : '1'} = <b style="color:#f472b6">${c}</b></div>`;
+ h += `<div class="scale"><div class="pole"></div><div class="base"></div><div class="beam" style="transform:rotate(${ang}deg)"><div class="pan l">${t}</div><div class="pan r">${c}</div></div></div>`;
+ if (s.final) h += `<div class="result ${s.ok ? 'yes' : 'no'}">${t} ${s.ok ? '==' : '≠'} ${c} → ${s.ok ? 'CASUS (Doğru)' : 'CASUS DEĞİL (Yanlış)'}</div>`;
+ viz.innerHTML = h;
+ }
+});
+
+/* =====================================================================
+ 6. MUTLU
+ ===================================================================== */
+function buildMutlu(sayi) {
+ if (!isInt(sayi, 1, 9999)) return { error: '1 ile 9999 arasında bir sayı gir.' };
+ const code = String.raw`int sayi = ${sayi};
+int mevcut_sayi = sayi;
+
+while (mevcut_sayi != 1 && mevcut_sayi != 4) { // Dış döngü: 1 veya 4 olana kadar
+ int kareler_toplami = 0;
+ while (mevcut_sayi > 0) { // İç döngü: basamak karelerini topla
+ int basamak = mevcut_sayi % 10;
+ kareler_toplami = kareler_toplami + basamak * basamak;
+ mevcut_sayi = mevcut_sayi / 10;
+ }
+ mevcut_sayi = kareler_toplami; // yeni sayı kareler toplamı olur
+}
+
+if (n == 1)
+ printf("%d mutlu bir sayidir :)\n", sayi);
+else
+ printf("%d mutsuz bir sayidir :(\n", sayi);`;
+ const R = rec(); let v = { sayi }; const chain = [sayi];
+ let cur = null, taken = 0, sq = [];
+ const X = (o = {}) => ({ chain: [...chain], cur, taken, sq: [...sq], focus: false, ...o });
+ R.push(1, v, `Başlangıç odası: <b>${sayi}</b> `, X());
+ v = { ...v, n: sayi };
+ R.push(2, v, `<b>n</b> = şu an bulunduğumuz oda.`, X());
+ let tur = 0;
+ while (true) {
+ if (v.n !== 1 && v.n !== 4 && tur < 40) {
+ tur++;
+ R.push(4, v, `DIŞ döngü (${tur}. tur): <b>${v.n} ≠ 1</b> ve <b>${v.n} ≠ 4</b> (Doğru) → Ne kazandık ne kaybettik, bir oda daha ilerle.`, X());
+ cur = v.n; taken = 0; sq = []; v = { ...v, toplam: 0 };
+ R.push(5, v, `Yeni tur için <b>toplam = 0</b>. Şimdi <b>${cur}</b>'in rakamlarının karelerini toplayacağız.`, X());
+ while (true) {
+ if (v.n > 0) {
+ R.push(6, v, `İÇ döngü: <b>${v.n} > 0</b> (Doğru)`, X({ focus: true }));
+ const b = v.n % 10; v = { ...v, b };
+ R.push(7, v, `${v.n} % 10 = <b>${b}</b>`, X({ focus: true }));
+ const ot = v.toplam; v = { ...v, toplam: ot + b * b }; sq.push(b);
+ R.push(8, v, `toplam = ${ot} + ${b}×${b} = ${ot} + ${b * b} = <b>${v.toplam}</b>`, X({ focus: true }));
+ const on = v.n; v = { ...v, n: Math.floor(on / 10) }; taken++;
+ R.push(9, v, `${on} / 10 = <b>${v.n}</b>`, X());
+ } else {
+ R.push(6, v, `İÇ döngü: n = 0 (Yanlış) → Rakamlar bitti, iç döngü sona erdi. Kareler toplamı = <b>${v.toplam}</b>. Dış döngüye dönüyoruz.`, X());
+ break;
+ }
+ }
+ v = { ...v, n: v.toplam }; chain.push(v.n);
+ R.push(11, v, `Yeni odamız: <b>n = ${v.n}</b> Zincir: ${chain.join(' → ')}`, X());
+ } else {
+ cur = null;
+ R.push(4, v, v.n === 1
+ ? `<b>n = 1</b> → DUR Çıkış kapısını bulduk! Dış döngü bitti.`
+ : `<b>n = 4</b> → DUR 4'e düştük. Buradan sonra sonsuza kadar 4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4 diye döner. Boşuna dönmeyelim.`, X());
+ break;
+ }
+ }
+ const ok = v.n === 1;
+ R.push(14, v, `<b>n == 1</b> mı? ${ok ? '<span class="ok">EVET (Doğru)</span>' : '<span class="bad">HAYIR (n = 4) (Yanlış)</span>'}`, X({ final: true, ok }));
+ if (ok) { R.print(`${sayi} mutlu bir sayidir :)\n`); R.push(15, v, ` <b>${sayi}</b> mutlu bir sayı! ${chain.length - 1} adımda 1'e ulaştı.`, X({ final: true, ok })); }
+ else { R.print(`${sayi} mutsuz bir sayidir :(\n`); R.push(17, v, ` <b>${sayi}</b> mutsuz bir sayı, kısır döngüye düştü.`, X({ final: true, ok })); }
+ return { steps: R.steps, code };
+}
+createStepper('st-mutlu', {
+ input: { label: 'Sayı:', value: 19, examples: [19, 7, 23, 100, 2, 4, 13] },
+ build: buildMutlu,
+ render(s, viz) {
+ let h = '<div class="vlabel">Oda zinciri</div><div class="chain">';
+ s.chain.forEach((c, k) => {
+ const cl = c === 1 ? 'one' : c === 4 ? 'four' : k === s.chain.length - 1 ? 'last' : '';
+ h += (k ? '<span class="arr">→</span>' : '') + `<span class="bub ${cl}">${c}</span>`;
+ });
+ h += '</div>';
+ if (s.cur !== null) {
+ h += `<div class="vlabel">Şu an işlenen: ${s.cur}</div>${digitsViz(s.cur, s.taken, s.focus, 'small')}`;
+ if (s.sq.length) h += `<div class="eq">${s.sq.map(b => `${b}<sup>2</sup>`).join(' + ')} = ${s.sq.map(b => b * b).join(' + ')} = <b class="cy">${s.sq.reduce((a, b) => a + b * b, 0)}</b></div>`;
+ }
+ if (s.final) h += `<div class="result ${s.ok ? 'yes' : 'no'}">${s.ok ? 'MUTLU SAYI ' : 'MUTSUZ SAYI '}</div>`;
+ viz.innerHTML = h;
+ }
+});
+</script>
+
+<script>
+/* =====================================================================
+ 7. İÇ İÇE DÖNGÜ — yıldız ızgarası
+ ===================================================================== */
+function buildNested(Rn, Cn, tri) {
+ const lim = tri ? 'i' : Cn;
+ const code = String.raw`for (int i = 1; i <= ${Rn}; i++) { // DIŞ döngü: satırlar
+ for (int j = 1; j <= ${lim}; j++) { // İÇ döngü: sütunlar
+ printf("* ");
+ }
+ printf("\n"); // satır bitti, alt satıra geç
+}`;
+ const R = rec(); const visited = []; let count = 0;
+ const cols = tri ? Rn : Cn;
+ const X = (cur = null, row = null) => ({ visited: visited.map(a => [...a]), cur, row, Rn, cols, tri });
+ for (let i = 1; ; i++) {
+ if (i <= Rn) {
+ R.push(1, { i, 'yıldız': count }, i === 1
+ ? `DIŞ döngü başlıyor: <b>i = 1</b>. 1 <= ${Rn} (Doğru) → İçeri gir.`
+ : `DIŞ döngü bir adım ilerledi: <b>i = ${i}</b>. ${i} <= ${Rn} (Doğru) → İç döngü <u>SIFIRDAN</u> (j = 1) başlayacak! `, X(null, i));
+ const L = tri ? i : Cn;
+ for (let j = 1; ; j++) {
+ if (j <= L) {
+ R.push(2, { i, j, 'yıldız': count }, `İÇ döngü: <b>j = ${j}</b>. ${j} <= ${tri ? `i (yani ${i})` : Cn} (Doğru)`, X([i, j], i));
+ count++; R.print('* '); visited.push([i, j]);
+ R.push(3, { i, j, 'yıldız': count }, `Ekrana bir yıldız ⭐ bastık. (satır i=${i}, sütun j=${j}) → toplam <b>${count}</b> yıldız.`, X([i, j], i));
+ } else {
+ R.push(2, { i, j, 'yıldız': count }, `<b>j = ${j}</b>. ${j} <= ${L} (Yanlış) → İÇ döngü bitti. ${tri ? `(Bu satırda i=${i} olduğu için ${i} yıldız bastı.)` : ''}`, X(null, i));
+ break;
+ }
+ }
+ R.print('\n');
+ R.push(5, { i, 'yıldız': count }, `Satır bitti → alt satıra geç (<code>\\n</code>). Şimdi DIŞ döngünün <code>i++</code> kısmına dönüyoruz.`, X(null, i));
+ } else {
+ R.push(1, { i, 'yıldız': count }, `<b>i = ${i}</b>. ${i} <= ${Rn} (Yanlış) → DIŞ döngü de bitti. Program sonu <br>Toplam <b>${count}</b> kez <code>printf("* ")</code> çalıştı${tri ? ` = 1 + 2 + ... + ${Rn}` : ` = ${Rn} × ${Cn}`}.`, X());
+ break;
+ }
+ }
+ return { steps: R.steps, code };
+}
+const stNested = createStepper('st-nested', {
+ render(s, viz) {
+ let h = `<div class="ngwrap"><div class="ngrid" style="grid-template-columns:40px repeat(${s.cols},46px)"><div></div>`;
+ for (let j = 1; j <= s.cols; j++) h += `<div class="nh ${s.cur && s.cur[1] === j ? 'on' : ''}">j=${j}</div>`;
+ for (let i = 1; i <= s.Rn; i++) {
+ h += `<div class="nh ${s.row === i ? 'on' : ''}">i=${i}</div>`;
+ for (let j = 1; j <= s.cols; j++) {
+ let c = 'nc';
+ if (s.tri && j > i) c += ' x';
+ else if (s.cur && s.cur[0] === i && s.cur[1] === j) c += ' c';
+ else if (s.visited.some(a => a[0] === i && a[1] === j)) c += ' v';
+ const vis = c.includes(' v') || c.includes(' c');
+ h += `<div class="${c}">${vis ? '⭐' : i + ',' + j}</div>`;
+ }
+ }
+ viz.innerHTML = h + '</div></div><p class="muted" style="text-align:center;font-size:13px;margin:8px 0 0">Mor etiket = döngü değişkenlerinin şu anki değeri. Yeşil = yıldız basılmış hücre.</p>';
+ }
+});
+function loadNested() {
+ const r = parseInt($('#ng-r').value), c = parseInt($('#ng-c').value), tri = $('#ng-shape').value === 'tri';
+ if (!isInt(r, 1, 6) || (!tri && !isInt(c, 1, 8))) { stNested.error('Satır 1-6, sütun 1-8 arasında olmalı.'); return; }
+ const res = buildNested(r, c, tri); stNested.load(res.steps, res.code);
+}
+$('#ng-go').onclick = loadNested; $('#ng-shape').onchange = loadNested; loadNested();
+
+/* ---------- saat ---------- */
+(() => {
+ let h = 0, m = 0, inner = 0, timer = null;
+ const draw = (flash) => {
+ $('#clk-h').textContent = String(h).padStart(2, '0'); $('#clk-m').textContent = String(m).padStart(2, '0');
+ $('#clk-outer').textContent = h + 1; $('#clk-inner').textContent = inner;
+ if (flash) { const e = $('#clk-h'); e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+ };
+ const stop = () => { clearInterval(timer); timer = null; $('#clk-play').textContent = '▶ Başlat'; };
+ const tick = () => {
+ inner++; m++;
+ let f = false;
+ if (m === 60) { m = 0; h++; f = true; }
+ if (h === 24) { h = 23; m = 59; inner = 1440; stop(); draw(); return; }
+ draw(f);
+ };
+ $('#clk-play').onclick = () => {
+ if (timer) { stop(); return; }
+ if (inner >= 1440) { h = 0; m = 0; inner = 0; }
+ $('#clk-play').textContent = '⏸ Durdur';
+ timer = setInterval(tick, 260 - $('#clk-speed').value * 25);
+ };
+ $('#clk-speed').oninput = () => { if (timer) { clearInterval(timer); timer = setInterval(tick, 260 - $('#clk-speed').value * 25); } };
+ $('#clk-reset').onclick = () => { stop(); h = 0; m = 0; inner = 0; draw(); };
+ draw();
+})();
+
+/* ---------- sayı avcısı ---------- */
+const HUNT = {
+ armstrong: {
+ f(n) { let t = n, c = 0, ops = 0; while (t > 0) { c++; t = Math.floor(t / 10); ops++; } t = n; let s = 0; while (t > 0) { s += Math.pow(t % 10, c); t = Math.floor(t / 10); ops++; } return [s === n, ops]; },
+ body: ` int temp = sayi, n = 0, toplam = 0;
+ while (temp > 0) { n++; temp /= 10; } // İÇ döngü 1: basamak say
+ temp = sayi;
+ while (temp > 0) { // İÇ döngü 2: kuvvet topla
+ toplam += (int)round(pow(temp % 10, n));
+ temp /= 10;
+ }
+ if (toplam == sayi) printf("%d ", sayi);`
+ },
+ palindrom: {
+ f(n) { let t = n, r = 0, ops = 0; while (t > 0) { r = r * 10 + t % 10; t = Math.floor(t / 10); ops++; } return [r === n, ops]; },
+ body: ` int temp = sayi, ters = 0;
+ while (temp > 0) { // İÇ döngü
+ ters = ters * 10 + temp % 10;
+ temp /= 10;
+ }
+ if (ters == sayi) printf("%d ", sayi);`
+ },
+ harshad: {
+ f(n) { let t = n, s = 0, ops = 0; while (t > 0) { s += t % 10; t = Math.floor(t / 10); ops++; } return [n % s === 0, ops]; },
+ body: ` int temp = sayi, toplam = 0;
+ while (temp > 0) { // İÇ döngü
+ toplam += temp % 10;
+ temp /= 10;
+ }
+ if (sayi % toplam == 0) printf("%d ", sayi);`
+ },
+ casus: {
+ f(n) { let t = n, s = 0, p = 1, ops = 0; while (t > 0) { const b = t % 10; s += b; p *= b; t = Math.floor(t / 10); ops++; } return [s === p, ops]; },
+ body: ` int temp = sayi, toplam = 0, carpim = 1;
+ while (temp > 0) { // İÇ döngü
+ toplam += temp % 10;
+ carpim *= temp % 10;
+ temp /= 10;
+ }
+ if (toplam == carpim) printf("%d ", sayi);`
+ },
+ mutlu: {
+ f(n) { let x = n, ops = 0, g = 0; while (x !== 1 && x !== 4 && g++ < 100) { let s = 0; while (x > 0) { const b = x % 10; s += b * b; x = Math.floor(x / 10); ops++; } x = s; } return [x === 1, ops]; },
+ body: ` int n = sayi;
+ while (n != 1 && n != 4) { // İÇ döngü
+ int toplam = 0;
+ while (n > 0) { // İÇ'in de İÇİ! (3 kat)
+ toplam += (n % 10) * (n % 10);
+ n /= 10;
+ }
+ n = toplam;
+ }
+ if (n == 1) printf("%d ", sayi);`
+ }
+};
+(() => {
+ let timer = null;
+ const showCode = () => {
+ const t = $('#hu-type').value, a = $('#hu-a').value, b = $('#hu-b').value;
+ $('#hu-code').innerHTML = `<pre class="code">${hlCode(`for (int sayi = ${a}; sayi <= ${b}; sayi++) { // DIŞ döngü: her sayıyı gez\n${HUNT[t].body}\n}`)}</pre>`;
+ };
+ const run = (instant) => {
+ clearInterval(timer);
+ const t = $('#hu-type').value, a = parseInt($('#hu-a').value), b = parseInt($('#hu-b').value);
+ showCode();
+ if (!isInt(a, 1, 1000000) || !isInt(b, 1, 1000000) || b < a || b - a > 100000) { $('#hu-res').innerHTML = '<span class="bad">Başlangıç ≤ bitiş olsun, sayılar pozitif olsun ve aralık en fazla 100.000 olsun.</span>'; return; }
+ const grid = $('#hu-grid'); const total = b - a + 1;
+ const showGrid = total <= 600;
+ grid.innerHTML = showGrid ? Array.from({ length: total }, (_, k) => `<div class="hn" id="hn${k}">${a + k}</div>`).join('') : '<p class="muted">Aralık büyük olduğu için ızgara gösterilmiyor (600\'den küçük aralık dene).</p>';
+ let outer = 0, inner = 0; const found = [];
+ const upd = () => {
+ $('#hu-outer').textContent = outer.toLocaleString('tr'); $('#hu-inner').textContent = inner.toLocaleString('tr'); $('#hu-found').textContent = found.length;
+ $('#hu-res').innerHTML = found.length ? `<b>Bulunanlar:</b> ${found.slice(0, 300).map(x => `<span class="chip" style="cursor:default">${x}</span>`).join('')}${found.length > 300 ? ' ...' : ''}` : 'Henüz bulunamadı...';
+ };
+ const stepOne = () => {
+ const n = a + outer; const [ok, ops] = HUNT[t].f(n);
+ outer++; inner += ops; if (ok) found.push(n);
+ if (showGrid) {
+ const prev = $('#hn' + (outer - 2)); if (prev) prev.classList.remove('cur');
+ const el = $('#hn' + (outer - 1)); el.classList.add(ok ? 'found' : 'no'); if (!instant) el.classList.add('cur');
+ }
+ };
+ if (instant || !showGrid) { while (outer < total) stepOne(); const last = $('#hn' + (total - 1)); if (last) last.classList.remove('cur'); upd(); return; }
+ const per = Math.max(1, Math.ceil(total / 300));
+ timer = setInterval(() => {
+ for (let k = 0; k < per && outer < total; k++) stepOne();
+ upd();
+ if (outer >= total) { clearInterval(timer); const last = $('#hn' + (total - 1)); if (last) last.classList.remove('cur'); }
+ }, 25);
+ };
+ $('#hu-go').onclick = () => run(false);
+ $('#hu-fast').onclick = () => run(true);
+ ['#hu-type', '#hu-a', '#hu-b'].forEach(s => $(s).addEventListener('change', showCode));
+ showCode();
+})();
+
+/* =====================================================================
+ 8. MATH.H HESAP MAKİNESİ
+ ===================================================================== */
+const cRound = x => x < 0 ? -Math.round(-x) : Math.round(x);
+const MATHF = [
+ { f: 'pow', a: ['taban (x)', 'üs (y)'], d: [2, 10], c: Math.pow, t: "x'in y. kuvveti. <code>pow(2, 10)</code> = 2'yi 10 kere çarp = 1024. Sonuç <b>double</b>!" },
+ { f: 'sqrt', a: ['x'], d: [144], c: Math.sqrt, t: 'Karekök. “Hangi sayıyı kendisiyle çarparsam x olur?” Negatif sayının karekökü yok → <code>nan</code> (Not a Number).' },
+ { f: 'cbrt', a: ['x'], d: [27], c: Math.cbrt, t: 'Küpkök. “Hangi sayıyı 3 kere çarparsam x olur?”' },
+ { f: 'fabs', a: ['x'], d: [-7.25], c: Math.abs, t: 'Mutlak değer (ondalıklı sayılar için). Sayının başındaki eksiyi siler, sıfıra olan uzaklık.' },
+ { f: 'abs', a: ['x'], d: [-42], c: x => Math.abs(Math.trunc(x)), int: true, t: 'Mutlak değer (<b>tam sayı</b>). DİKKAT: <code>stdlib.h</code> içindedir ve <code>int</code> döndürür → <code>%d</code> ile yazdırılır.' },
+ { f: 'ceil', a: ['x'], d: [2.1], c: Math.ceil, t: 'Tavan ⬆️: Her zaman <b>yukarı</b> yuvarlar. <code>ceil(2.1)</code> = 3, <code>ceil(-2.9)</code> = -2 (çünkü -2, -2.9\'dan büyüktür!).' },
+ { f: 'floor', a: ['x'], d: [2.9], c: Math.floor, t: 'Taban ⬇️: Her zaman <b>aşağı</b> yuvarlar. <code>floor(2.9)</code> = 2, <code>floor(-2.1)</code> = -3.' },
+ { f: 'round', a: ['x'], d: [2.5], c: cRound, t: 'En yakın tam sayıya yuvarlar. Tam ortadaysa (.5) <b>sıfırdan uzağa</b>: 2.5 → 3, -2.5 → -3.' },
+ { f: 'fmod', a: ['x', 'y'], d: [7.5, 2], c: (x, y) => x % y, t: 'Ondalıklı sayılarda kalan. <code>%</code> operatörü double ile <b>çalışmaz</b>, onun yerine fmod kullanılır. 7.5 = 2×3 + <b>1.5</b>' },
+ { f: 'log10', a: ['x'], d: [1000], c: Math.log10, t: "10 üzeri kaç x eder? log10(1000) = 3. Basamak saymak için süper." },
+ { f: 'log', a: ['x'], d: [2.718281828], c: Math.log, t: 'Doğal logaritma (ln), tabanı e ≈ 2.718.' },
+ { f: 'exp', a: ['x'], d: [1], c: Math.exp, t: 'e üzeri x.' },
+ { f: 'sin', a: ['x (radyan)'], d: [1.5707963], c: Math.sin, t: 'Sinüs. DİKKAT: açı <b>derece değil radyan</b>! 90° = π/2 ≈ 1.5708. Derece → radyan: <code>derece * M_PI / 180</code>' },
+];
+(() => {
+ let cur = MATHF[0];
+ const cfmt = x => isNaN(x) ? '-nan' : !isFinite(x) ? (x > 0 ? 'inf' : '-inf') : x.toFixed(6);
+ const numStr = x => String(x);
+ const btns = $('#mc-btns');
+ btns.innerHTML = MATHF.map((m, k) => `<button class="btn" data-k="${k}">${m.f}</button>`).join('');
+ function pick(m) {
+ cur = m;
+ $$('.btn', btns).forEach(b => b.classList.toggle('sel', MATHF[b.dataset.k] === m));
+ $('#mc-inputs').innerHTML = m.a.map((n, k) => `<label>${n} = <input type="number" step="any" class="mc-in" value="${m.d[k]}"></label>`).join('');
+ $$('.mc-in').forEach(i => i.oninput = calc);
+ $('#mc-desc').innerHTML = `<b>${m.f}</b>: ${m.t}`;
+ calc();
+ }
+ function calc() {
+ const vals = $$('.mc-in').map(i => parseFloat(i.value));
+ if (vals.some(isNaN)) return;
+ const args = vals.map(numStr).join(', ');
+ const r = cur.c(...vals);
+ let code, out;
+ if (cur.int) {
+ code = `#include <stdlib.h>\nint sonuc = abs(${Math.trunc(vals[0])});\nprintf("%d\\n", sonuc);`;
+ out = String(r) + (vals[0] !== Math.trunc(vals[0]) ? `\n(not: abs tam sayı alır, ${vals[0]} → ${Math.trunc(vals[0])} olarak kesildi)` : '');
+ } else {
+ code = `#include <math.h>\ndouble sonuc = ${cur.f}(${args});\nprintf("%f\\n", sonuc); // 6 basamak\nprintf("%.2f\\n", sonuc); // 2 basamak\nprintf("%d\\n", (int)sonuc); // int'e çevir (küsurat ATILIR)`;
+ out = `${cfmt(r)}\n${isFinite(r) ? r.toFixed(2) : cfmt(r)}\n${isFinite(r) ? Math.trunc(r) : '(tanımsız)'}`;
+ }
+ $('#mc-code').innerHTML = hlCode(code);
+ $('#mc-out').textContent = out;
+ }
+ $$('.btn', btns).forEach(b => b.onclick = () => pick(MATHF[b.dataset.k]));
+ pick(cur);
+})();
+
+/* log10 ile basamak sayısı */
+(() => {
+ const f = () => {
+ const n = parseInt($('#lg-n').value), o = $('#lg-out');
+ if (!isInt(n, 1, 2e9)) { o.innerHTML = '<span class="bad">Pozitif bir tam sayı gir (log10(0) tanımsız!).</span>'; return; }
+ const l = Math.log10(n);
+ o.innerHTML = `log10(${n}) = <b class="cy">${l.toFixed(4)}</b><br>(int) ${l.toFixed(4)} = <b class="y">${Math.trunc(l)}</b> <span class="muted">(küsurat atıldı)</span><br>${Math.trunc(l)} + 1 = <b class="ok">${Math.trunc(l) + 1}</b> basamak (Doğru) <span class="muted">(kontrol: "${n}" → ${String(n).length} karakter)</span>`;
+ };
+ $('#lg-n').oninput = f; f();
+})();
+
+/* =====================================================================
+ 9. POINTER — bellek görseli
+ ===================================================================== */
+let MEM_UID = 0;
+function renderMem(viz, cells, prev, extra = '') {
+ const frames = [];
+ cells.forEach(c => { let f = frames.find(x => x.name === c.frame); if (!f) { f = { name: c.frame, cells: [] }; frames.push(f); } f.cells.push(c); });
+ const targets = new Set(cells.filter(c => c.to).map(c => c.to));
+ const pv = {}; (prev || []).forEach(c => pv[c.name] = c);
+ let h = '<div class="mem"><svg></svg><div class="mem-row">';
+ frames.forEach(f => {
+ h += `<div class="mem-frame"><span class="fl">${f.name}</span>`;
+ f.cells.forEach(c => {
+ const ch = prev && (!pv[c.name] || pv[c.name].val !== c.val);
+ h += `<div class="cell ${c.to ? 'ptr' : ''} ${ch ? 'flash' : ''} ${targets.has(c.name) ? 'target' : ''}" data-n="${c.name}">
+ <div class="ad">${c.addr}</div><div class="box">${c.val}</div><div class="nm">${c.name}</div><div class="ty">${c.type}</div></div>`;
+ });
+ h += '</div>';
+ });
+ h += '</div></div>' + extra;
+ viz.innerHTML = h;
+ const mem = $('.mem', viz), svg = $('svg', mem), row = $('.mem-row', mem);
+ const mr = mem.getBoundingClientRect();
+ svg.setAttribute('width', Math.max(row.scrollWidth + 20, mem.clientWidth));
+ svg.setAttribute('height', mem.scrollHeight);
+ const colors = ['#a78bfa', '#22d3ee', '#f472b6', '#facc15'];
+ const uid = ++MEM_UID;
+ let defs = '<defs>', paths = '';
+ cells.filter(c => c.to).forEach((c, k) => {
+ const col = colors[k % colors.length];
+ defs += `<marker id="ah${uid}_${k}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${col}"/></marker>`;
+ const s = $(`.cell[data-n="${c.name}"]`, mem), t = $(`.cell[data-n="${c.to}"]`, mem);
+ if (!s || !t) return;
+ const sr = s.getBoundingClientRect(), tr = t.getBoundingClientRect();
+ const x1 = sr.left + sr.width / 2 - mr.left + mem.scrollLeft + 6, y1 = sr.top - mr.top;
+ const x2 = tr.left + tr.width / 2 - mr.left + mem.scrollLeft - 6, y2 = tr.top - mr.top - 2;
+ const cy = Math.min(y1, y2) - 34 - k * 10;
+ paths += `<path d="M${x1},${y1} C${x1},${cy} ${x2},${cy} ${x2},${y2}" fill="none" stroke="${col}" stroke-width="2.5" marker-end="url(#ah${uid}_${k})"/>`;
+ });
+ svg.innerHTML = defs + '</defs>' + paths;
+}
+
+function ptrBasicSteps() {
+ const R = rec(); const AD = { a: '0x100', b: '0x104', p: '0x108', pp: '0x110' };
+ let cells = [];
+ const C = (name, val, type, to) => ({ name, addr: AD[name], val, type, to, frame: 'main()' });
+ const S = () => ({ cells: cells.map(c => ({ ...c })) });
+ const set = (n, val, to) => { const c = cells.find(x => x.name === n); c.val = val; if (to !== undefined) c.to = to; };
+ cells = [C('a', 5, 'int')];
+ R.push(1, { a: 5, '&a': '0x100' }, `Bellekte <b>a</b> adında bir kutu (daire ) açıldı. Kapı numarası yani <b>adresi 0x100</b>, içinde <b>5</b> var.`, S());
+ cells.push(C('b', 8, 'int'));
+ R.push(2, { a: 5, b: 8 }, `Hemen yanında <b>b</b> dairesi: adresi <b>0x104</b> (int 4 bayt yer kaplar, o yüzden 4 ileride), içinde <b>8</b>.`, S());
+ cells.push(C('p', '0x100', 'int*', 'a'));
+ R.push(3, { a: 5, b: 8, p: '0x100', '*p': 5 }, `<b>p</b> de bir kutu! Ama içine sayı değil <b>ADRES</b> koyuyoruz. <code>&a</code> = “a'nın adresi” = 0x100.<br>Artık <b>p, a'yı gösteriyor</b> (ok işareti ->). p'nin içinde a'nın kapı numarası yazan bir kâğıt var .`, S());
+ set('a', 20);
+ R.push(4, { a: 20, b: 8, p: '0x100', '*p': 20 }, `<code>*p = 20</code> → “p'deki adrese (0x100) <b>git</b>, oradaki kutuya 20 yaz.” O kutu a!<br> <b>a'nın adını hiç anmadan a'yı değiştirdik.</b>`, S());
+ set('p', '0x104', 'b');
+ R.push(5, { a: 20, b: 8, p: '0x104', '*p': 8 }, `<code>p = &b</code> → p'nin kâğıdını silip b'nin adresini (0x104) yazdık. Ok artık <b>b'yi</b> gösteriyor. a eski haliyle (20) kaldı.`, S());
+ set('b', 9);
+ R.push(6, { a: 20, b: 9, p: '0x104', '*p': 9 }, `<code>*p = *p + 1</code> → Sağ taraf: *p = (p'nin gösterdiği yer = b) = 8, +1 = 9. Sol taraf: *p yani b'ye 9 yaz. Yani <b>b = b + 1</b> yapmış olduk.`, S());
+ cells.push(C('pp', '0x108', 'int**', 'p'));
+ R.push(7, { a: 20, b: 9, p: '0x104', pp: '0x108', '*pp': '0x104', '**pp': 9 }, `<b>pp</b>: pointer'ı gösteren pointer! p de bir kutu olduğuna göre onun da bir adresi var (0x108). pp bu adresi tutuyor.<br>Hazine haritası gibi: pp'deki kâğıt p'yi gösteriyor, p'deki kâğıt b'yi gösteriyor `, S());
+ set('b', 100);
+ R.push(8, { a: 20, b: 100, p: '0x104', pp: '0x108', '*pp': '0x104', '**pp': 100 }, `<code>**pp = 100</code> → 1. yıldız: pp'den p'ye git. 2. yıldız: p'den b'ye git. Oraya 100 yaz → <b>b = 100</b>.`, S());
+ R.print('a=20 b=100 *p=100\n');
+ R.push(9, { a: 20, b: 100, p: '0x104', '*p': 100 }, `Sonuç: a = 20, b = 100, *p = (p, b'yi gösterdiği için) 100. `, S());
+ return R.steps;
+}
+const PTR_CODE = String.raw`int a = 5;
+int b = 8;
+int *p = &a; // p, a'nın adresini tutar
+*p = 20; // p'nin gösterdiği yere 20 yaz
+p = &b; // artık p, b'yi gösteriyor
+*p = *p + 1; // b = b + 1
+int **pp = &p; // pointer'ı gösteren pointer
+**pp = 100; // pp → p → b
+printf("a=%d b=%d *p=%d\n", a, b, *p);`;
+const stPtr = createStepper('st-ptr', { code: PTR_CODE, render: (s, viz, p) => renderMem(viz, s.cells, p && p.cells) });
+stPtr.load(ptrBasicSteps());
+
+/* ---------- swap ---------- */
+function swapSteps(byPtr) {
+ const R = rec(); let cells = [];
+ const S = () => ({ cells: cells.map(c => ({ ...c })) });
+ const M = (name, val) => ({ name, addr: name === 'a' ? '0x100' : '0x104', val, type: 'int', frame: 'main()' });
+ const F = (name, val, type, to, addr) => ({ name, addr, val, type, to, frame: 'degistir()' });
+ const set = (n, val) => { cells.find(x => x.name === n).val = val; };
+ cells = [M('a', 3), M('b', 7)];
+ R.push(8, { a: 3, b: 7 }, `main'de iki kutu: <b>a = 3</b>, <b>b = 7</b>. Hedef: yerlerini değiştirmek (a = 7, b = 3 olsun).`, S());
+ if (!byPtr) {
+ cells.push(F('x', 3, 'int', null, '0x200'), F('y', 7, 'int', null, '0x204'));
+ R.push(9, { a: 3, b: 7, x: 3, y: 7 }, `<code>degistir(a, b)</code> çağrıldı. DİKKAT: C fonksiyona değişkenin <b>kendisini değil, FOTOKOPİSİNİ</b> gönderir!<br>Fonksiyonun içinde <b>yepyeni</b> x ve y kutuları açıldı (adresleri farklı: 0x200, 0x204).`, S());
+ cells.push(F('gecici', 3, 'int', null, '0x208'));
+ R.push(2, { a: 3, b: 7, x: 3, y: 7, gecici: 3 }, `gecici = x = 3 (x'in değerini kenara koyduk, yoksa kaybolurdu).`, S());
+ set('x', 7);
+ R.push(3, { a: 3, b: 7, x: 7, y: 7, gecici: 3 }, `x = y → x = 7`, S());
+ set('y', 3);
+ R.push(4, { a: 3, b: 7, x: 7, y: 3, gecici: 3 }, `y = gecici → y = 3. x ve y değişti... <b>ama a ve b'ye bak!</b> Hâlâ 3 ve 7. Biz sadece fotokopileri karaladık. `, S());
+ cells = cells.filter(c => c.frame === 'main()');
+ R.push(5, { a: 3, b: 7 }, `Fonksiyon bitti → x, y, gecici <b>çöpe gitti</b> (fonksiyonun kutuları fonksiyonla birlikte ölür).`, S());
+ R.print('a=3 b=7\n');
+ R.push(10, { a: 3, b: 7 }, `Ekran: <b>a=3 b=7</b>. HİÇBİR ŞEY DEĞİŞMEDİ Çözüm: adres göndermek → yukarıdan “(Doğru) Adres ile” butonuna bas.`, S());
+ } else {
+ cells.push(F('x', '0x100', 'int*', 'a', '0x200'), F('y', '0x104', 'int*', 'b', '0x208'));
+ R.push(9, { a: 3, b: 7, x: '0x100', y: '0x104' }, `<code>degistir(&a, &b)</code> çağrıldı. Bu sefer fotokopi değil, <b>EV ADRESLERİNİ</b> verdik. x, a'yı; y, b'yi gösteriyor.`, S());
+ cells.push(F('gecici', 3, 'int', null, '0x210'));
+ R.push(2, { a: 3, b: 7, x: '0x100', y: '0x104', '*x': 3, '*y': 7, gecici: 3 }, `gecici = *x → x'in gösterdiği yere (a) git, değeri al: 3.`, S());
+ set('a', 7);
+ R.push(3, { a: 7, b: 7, x: '0x100', y: '0x104', '*x': 7, '*y': 7, gecici: 3 }, `*x = *y → y'nin gösterdiği yerdeki değeri (b = 7) al, x'in gösterdiği yere (a) yaz. <b>main'deki a = 7 oldu!</b> `, S());
+ set('b', 3);
+ R.push(4, { a: 7, b: 3, x: '0x100', y: '0x104', '*x': 7, '*y': 3, gecici: 3 }, `*y = gecici → b'ye 3 yaz. <b>b = 3 oldu!</b>`, S());
+ cells = cells.filter(c => c.frame === 'main()');
+ R.push(5, { a: 7, b: 3 }, `Fonksiyon bitti, x, y, gecici çöpe gitti. Ama umurumuzda değil, çünkü <b>asıl kutuları</b> değiştirdik.`, S());
+ R.print('a=7 b=3\n');
+ R.push(10, { a: 7, b: 3 }, `Ekran: <b>a=7 b=3</b> Başardık! Pointer = başka bir fonksiyonun senin değişkenini değiştirebilmesinin <b>tek yolu</b>.`, S());
+ }
+ return R.steps;
+}
+const SWAP_CODE = {
+ val: String.raw`void degistir(int x, int y) { // fotokopi alır
+ int gecici = x;
+ x = y;
+ y = gecici;
+}
+
+int main() {
+ int a = 3, b = 7;
+ degistir(a, b); // değerleri gönder
+ printf("a=%d b=%d\n", a, b);
+}`,
+ ptr: String.raw`void degistir(int *x, int *y) { // adres alır
+ int gecici = *x;
+ *x = *y;
+ *y = gecici;
+}
+
+int main() {
+ int a = 3, b = 7;
+ degistir(&a, &b); // adresleri gönder
+ printf("a=%d b=%d\n", a, b);
+}`
+};
+const stSwap = createStepper('st-swap', { render: (s, viz, p) => renderMem(viz, s.cells, p && p.cells) });
+function loadSwap(byPtr) {
+ $('#sw-val').classList.toggle('sel', !byPtr); $('#sw-ptr').classList.toggle('sel', byPtr);
+ stSwap.load(swapSteps(byPtr), byPtr ? SWAP_CODE.ptr : SWAP_CODE.val);
+}
+$('#sw-val').onclick = () => loadSwap(false); $('#sw-ptr').onclick = () => loadSwap(true);
+loadSwap(false);
+
+/* ---------- pointer aritmetiği ---------- */
+(() => {
+ const T = { int: { s: 4, v: [10, 20, 30, 40, 50], f: '%d', lit: '{10, 20, 30, 40, 50}' }, char: { s: 1, v: ["'M'", "'E'", "'R'", "'H'", "'A'"], f: '%c', lit: '"MERHA"' }, double: { s: 8, v: [1.5, 2.5, 3.5, 4.5, 5.5], f: '%.1f', lit: '{1.5, 2.5, 3.5, 4.5, 5.5}' } };
+ const base = 0x200;
+ const f = () => {
+ const ty = $('#pa-type').value, k = parseInt($('#pa-k').value), t = T[ty];
+ $('#pa-kv').textContent = k;
+ const decl = ty === 'char' ? `char dizi[5] = {'M', 'E', 'R', 'H', 'A'};` : `${ty} dizi[5] = ${t.lit};`;
+ $('#pa-code').innerHTML = hlCode(`${decl}\n${ty} *p = dizi; // dizinin adı = ilk elemanın adresi\nprintf("${t.f}", *(p + ${k})); // dizi[${k}] ile AYNI şey`);
+ let h = '';
+ for (let i = 0; i < 6; i++) {
+ const ghost = i === 5;
+ h += `<div class="ac ${i === k ? 'on' : ''} ${ghost ? 'ghost' : ''}"><div class="pl">${i === k ? (k === 0 ? 'p ⬇' : `p+${k} ⬇`) : ''}</div><div class="box">${ghost ? '???' : String(t.v[i]).replace(/'/g, '')}</div><small>${ghost ? 'dizi dışı!' : `dizi[${i}]`}</small><small>${hex(base + i * t.s)}</small></div>`;
+ }
+ $('#pa-cells').innerHTML = h;
+ $('#pa-info').innerHTML = k < 5
+ ? `<code>p + ${k}</code> = ${hex(base)} + ${k} × sizeof(${ty}) = ${hex(base)} + ${k} × ${t.s} = <b class="cy">${hex(base + k * t.s)}</b><br><code>*(p + ${k})</code> = o adresteki değer = <b class="y">${String(t.v[k]).replace(/'/g, '')}</b> = <code>dizi[${k}]</code> (Doğru)<br><span class="muted">Yani <code>dizi[i]</code> aslında <code>*(dizi + i)</code>'nin kısa yazılışıdır!</span>`
+ : `<span class="bad">Dikkat: p + 5 = ${hex(base + 5 * t.s)} → Dizinin <b>dışına</b> çıktın! Orası senin değil. C seni durdurmaz; çöp değer okursun ya da program çöker (tanımsız davranış). 5 elemanlı dizinin son indisi <b>4</b>'tür.</span>`;
+ };
+ $('#pa-type').onchange = f; $('#pa-k').oninput = f; f();
+})();
+</script>
+
+<script>
+/* =====================================================================
+ 10. MALLOC & CALLOC HEAP SİMÜLATÖRÜ
+ ===================================================================== */
+(() => {
+ const TOTAL_CELLS = 24;
+ const BASE_ADDR = 0x5000;
+ const CELL_SIZE = 4; // int = 4 bytes
+
+ // Bellek durumu modeli
+ let heapState = Array.from({ length: TOTAL_CELLS }, (_, i) => ({
+ addr: BASE_ADDR + i * CELL_SIZE,
+ val: '?', // Çöp değer
+ owner: null, // 'p' veya null
+ isLeaked: false,
+ isFreed: false,
+ isDangling: false
+ }));
+
+ let pointerVal = null; // null veya 0x5000 gibi adres
+ let pointerBlocks = 0; // Kiralandığı anki eleman sayısı n
+ let logHistory = [];
+
+ function log(msg, type = 'info') {
+ const time = new Date().toLocaleTimeString('tr-TR');
+ logHistory.unshift(`[${time}] ${msg}`);
+ if (logHistory.length > 30) logHistory.pop();
+ const lEl = $('#hp-log');
+ if (lEl) {
+ lEl.innerHTML = logHistory.map(line => `<div>${line}</div>`).join('');
+ }
+ }
+
+ function setMsg(html, type = '') {
+ const m = $('#hp-msg');
+ m.className = 'hmsg ' + type;
+ m.innerHTML = html;
+ }
+
+ function renderHeap() {
+ const hEl = $('#hp-heap');
+ const pEl = $('#hp-p');
+ const pStateEl = $('#hp-pstate');
+
+ pEl.textContent = pointerVal ? hex(pointerVal) : 'NULL';
+
+ if (pointerVal) {
+ pStateEl.innerHTML = `<span class="ok">● Adres gösteriyor (${hex(pointerVal)})</span><br><small class="muted">${pointerBlocks} adet int (${pointerBlocks * 4} bayt)</small>`;
+ } else {
+ pStateEl.innerHTML = `<span class="muted">○ Boş (NULL)</span>`;
+ }
+
+ let h = '';
+ heapState.forEach((c, idx) => {
+ let cls = 'hc';
+ if (c.owner === 'p') cls += ' used';
+ else if (c.isLeaked) cls += ' leak';
+ else if (c.isFreed) cls += ' freed';
+
+ let indStr = '';
+ if (pointerVal && c.owner === 'p') {
+ const offset = (c.addr - pointerVal) / CELL_SIZE;
+ indStr = `p[${offset}]`;
+ }
+
+ h += `<div class="${cls}" id="hc-${idx}">
+ <div class="ha">${hex(c.addr)}</div>
+ <div class="hi">${indStr}</div>
+ <div class="hv">${c.val}</div>
+ </div>`;
+ });
+ hEl.innerHTML = h;
+ }
+
+ function doMalloc(isCalloc = false) {
+ const n = parseInt($('#hp-n').value);
+ if (!isInt(n, 1, 12)) {
+ setMsg('Lütfen 1 ile 12 arasında bir sayı seçin.', 'w');
+ return;
+ }
+
+ // Zaten bir yer tutuyorsa ve free edilmediyse sızıntı olur!
+ let leakOccurred = false;
+ if (pointerVal !== null) {
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ c.owner = null;
+ c.isLeaked = true;
+ leakOccurred = true;
+ }
+ });
+ if (leakOccurred) {
+ log(`Dikkat: UYARI: Önceki alan free() edilmeden p'ye yeni adres atandı! Bellek sızıntısı (Memory Leak)!`, 'bad');
+ }
+ }
+
+ // Heap'te n blokluk boş yer ara
+ let startIdx = -1;
+ for (let i = 0; i <= TOTAL_CELLS - n; i++) {
+ let fit = true;
+ for (let j = 0; j < n; j++) {
+ if (heapState[i + j].owner !== null || heapState[i + j].isLeaked) {
+ fit = false;
+ break;
+ }
+ }
+ if (fit) {
+ startIdx = i;
+ break;
+ }
+ }
+
+ if (startIdx === -1) {
+ setMsg(`(Yanlış) <b>NULL döndü!</b> Heap üzerinde peş peşe boş ${n} blok bulunamadı!`, 'e');
+ log(`p = NULL (bellek yetersiz)`, 'bad');
+ pointerVal = null;
+ pointerBlocks = 0;
+ renderHeap();
+ return;
+ }
+
+ // Alanı tahsis et
+ for (let j = 0; j < n; j++) {
+ const cell = heapState[startIdx + j];
+ cell.owner = 'p';
+ cell.isFreed = false;
+ cell.isLeaked = false;
+ if (isCalloc) {
+ cell.val = '0';
+ } else {
+ // Rastgele çöp değer
+ cell.val = Math.floor(Math.random() * 899 + 100);
+ }
+ }
+
+ pointerVal = heapState[startIdx].addr;
+ pointerBlocks = n;
+
+ const fnName = isCalloc ? `calloc(${n}, sizeof(int))` : `malloc(${n} * sizeof(int))`;
+ log(`int *p = (int*) ${fnName}; // Adres: ${hex(pointerVal)}`);
+
+ if (leakOccurred) {
+ setMsg(`Uyarı: <b>BELLEK SIZINTISI OLUŞTU!</b> Önceki kiraladığınız alanı <code>free(p)</code> yapmadan yeni yer kiraladınız. Eski kutuların adresi kayboldu, sonsuza dek kilitli kaldı (kırmızı alanlar)!<br>Yeni alan: <b>${hex(pointerVal)}</b>`, 'w');
+ } else if (isCalloc) {
+ setMsg(`(Doğru) <b>calloc çalıştı:</b> Heap'ten ${n} kutu (${n * 4} bayt) kiralandı ve her kutu <b>0 ile temizlendi</b>!`, 'g');
+ } else {
+ setMsg(` <b>malloc çalıştı:</b> Heap'ten ${n} kutu (${n * 4} bayt) kiralandı. Kutulardaki sayılara dikkat et: <b>çöp (rastgele) değerler</b> var! Temizlenmedi.`, 'g');
+ }
+
+ renderHeap();
+ }
+
+ function doFree() {
+ if (pointerVal === null) {
+ setMsg(`Dikkat: <b>p zaten NULL!</b> Boş pointer free edilemez (zararsız ama bir şey yapmaz).`, 'w');
+ log(`free(p); // p zaten NULL idi.`);
+ return;
+ }
+
+ let freedCount = 0;
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ c.owner = null;
+ c.isFreed = true;
+ c.val = '';
+ freedCount++;
+ }
+ });
+
+ log(`free(p); // ${hex(pointerVal)} adresindeki ${freedCount} kutu sisteme iade edildi.`);
+ setMsg(` <b>free(p) çalıştı:</b> Depo anahtarı teslim edildi. Ancak dikkat! <b>p hâlâ ${hex(pointerVal)} adresini biliyor!</b> Buna <i>sarkan pointer (dangling pointer)</i> denir. Güvenlik için hemen arkasından <code>p = NULL;</code> yapmalısın.`, 'g');
+ renderHeap();
+ }
+
+ function doNull() {
+ pointerVal = null;
+ pointerBlocks = 0;
+ log(`p = NULL; // Artık hiçbir yeri göstermiyor.`);
+ setMsg(` <b>p = NULL yapıldı:</b> Artık pointer boş bir adresi tutuyor. Yanlışlıkla eski adrese yazma riski engellendi.`, 'g');
+ renderHeap();
+ }
+
+ function doWrite() {
+ const idx = parseInt($('#hp-i').value);
+ const val = parseInt($('#hp-v').value);
+
+ if (pointerVal === null) {
+ setMsg(` <b>SEGMENTATION FAULT (ÇÖKME)!</b> <code>p</code> şu anda NULL! Olmayan bir adrese yazmaya çalıştın!`, 'e');
+ log(`CRASH: *p = ${val} (p NULL iken erişim)`, 'bad');
+ return;
+ }
+
+ // Sarkan pointer kontrolü: p bir adres gösteriyor ama o adres artık p'ye ait değilse
+ const targetAddr = pointerVal + idx * CELL_SIZE;
+ const targetCell = heapState.find(c => c.addr === targetAddr);
+
+ if (!targetCell) {
+ setMsg(` <b>BELLEK TAŞMASI (BUFFER OVERFLOW)!</b> Heap sınırlarının çok dışına çıktın! (${hex(targetAddr)})`, 'e');
+ log(`CRASH: p[${idx}] geçersiz bellek sınırı`, 'bad');
+ return;
+ }
+
+ if (targetCell.owner !== 'p') {
+ if (targetCell.isFreed) {
+ setMsg(`Uyarı: <b>USE-AFTER-FREE HATASI!</b> Teslim ettiğin (free edilmiş) depoya kaçak eşya koymaya çalıştın! Çok tehlikeli bir güvenlik açığıdır.`, 'e');
+ log(`HATA: p[${idx}] free edilmiş adrese yazıldı!`, 'bad');
+ } else {
+ setMsg(`Uyarı: <b>BELLEK TAŞMASI!</b> Kiraladığın sınır ${pointerBlocks} elemandı, sen <code>p[${idx}]</code> indisine yazmaya çalıştın!`, 'e');
+ log(`HATA: Sınır dışı yazım: p[${idx}]`, 'bad');
+ }
+ targetCell.val = `<span class="bad">${val}</span>`;
+ renderHeap();
+ return;
+ }
+
+ targetCell.val = val;
+ log(`p[${idx}] = ${val}; // Adres: ${hex(targetAddr)}`);
+ setMsg(` <b>Yazıldı:</b> <code>p[${idx}] = ${val}</code> → ${hex(targetAddr)} adresindeki kutunun içine <b>${val}</b> kondu.`, 'g');
+ renderHeap();
+ }
+
+ function doFill() {
+ if (pointerVal === null || pointerBlocks === 0) {
+ setMsg(`Önce malloc veya calloc ile yer kirala!`, 'w');
+ return;
+ }
+ for (let i = 0; i < pointerBlocks; i++) {
+ const addr = pointerVal + i * CELL_SIZE;
+ const cell = heapState.find(c => c.addr === addr);
+ if (cell && cell.owner === 'p') {
+ cell.val = i * 10;
+ }
+ }
+ log(`for (int i = 0; i < ${pointerBlocks}; i++) p[i] = i * 10;`);
+ setMsg(` <b>for döngüsü bitti:</b> ${pointerBlocks} elemanın hepsi değerlerle dolduruldu!`, 'g');
+ renderHeap();
+ }
+
+ function doRealloc() {
+ const n = parseInt($('#hp-n').value);
+ if (pointerVal === null) {
+ setMsg(`p NULL iken realloc çağırırsan malloc(${n}) gibi davranır.`, 'info');
+ doMalloc(false);
+ return;
+ }
+
+ log(`p = (int*) realloc(p, ${n} * sizeof(int));`);
+
+ // Basit simülasyon: Eski değerleri topla
+ const oldVals = [];
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ oldVals.push(c.val);
+ c.owner = null;
+ c.isFreed = true;
+ }
+ });
+
+ // Yeni n kadar yer ara
+ let startIdx = -1;
+ for (let i = 0; i <= TOTAL_CELLS - n; i++) {
+ let fit = true;
+ for (let j = 0; j < n; j++) {
+ if (heapState[i + j].owner !== null && !heapState[i + j].isFreed) {
+ fit = false;
+ break;
+ }
+ }
+ if (fit) {
+ startIdx = i;
+ break;
+ }
+ }
+
+ if (startIdx === -1) {
+ setMsg(`(Yanlış) <b>realloc başarısız:</b> Yeterli ardışık alan bulunamadı. Eski bellek bozulmadı.`, 'e');
+ renderHeap();
+ return;
+ }
+
+ for (let j = 0; j < n; j++) {
+ const cell = heapState[startIdx + j];
+ cell.owner = 'p';
+ cell.isFreed = false;
+ cell.isLeaked = false;
+ cell.val = j < oldVals.length ? oldVals[j] : Math.floor(Math.random() * 899 + 100);
+ }
+
+ pointerVal = heapState[startIdx].addr;
+ pointerBlocks = n;
+
+ setMsg(` <b>realloc tamamlandı:</b> Bellek boyutu ${n} elemana uyarlandı. Eski veriler korundu, gerekiyorsa yeni kutular eklendi.`, 'g');
+ renderHeap();
+ }
+
+ function doReset() {
+ heapState = Array.from({ length: TOTAL_CELLS }, (_, i) => ({
+ addr: BASE_ADDR + i * CELL_SIZE,
+ val: '?',
+ owner: null,
+ isLeaked: false,
+ isFreed: false,
+ isDangling: false
+ }));
+ pointerVal = null;
+ pointerBlocks = 0;
+ logHistory = [];
+ setMsg('Bellek simülatörü sıfırlandı.');
+ $('#hp-log').innerHTML = '';
+ renderHeap();
+ }
+
+ $('#hp-malloc').onclick = () => doMalloc(false);
+ $('#hp-calloc').onclick = () => doMalloc(true);
+ $('#hp-free').onclick = doFree;
+ $('#hp-null').onclick = doNull;
+ $('#hp-write').onclick = doWrite;
+ $('#hp-fill').onclick = doFill;
+ $('#hp-realloc').onclick = doRealloc;
+ $('#hp-reset').onclick = doReset;
+
+ renderHeap();
+})();
+
+/* =====================================================================
+ 11. FONKSİYONLARLA MATRİSLER LABORATUVARI
+ ===================================================================== */
+(() => {
+ // Matris boyut seçeneklerini doldur
+ ['ma-r', 'ma-c', 'mb-r', 'mb-c'].forEach(id => {
+ const sel = $('#' + id);
+ if (!sel) return;
+ sel.innerHTML = [2, 3, 4].map(v => `<option value="${v}">${v}</option>`).join('');
+ });
+
+ $('#ma-r').value = '2';
+ $('#ma-c').value = '3';
+ $('#mb-r').value = '3';
+ $('#mb-c').value = '2';
+
+ let matA = [
+ [1, 2, 3],
+ [4, 5, 6]
+ ];
+ let matB = [
+ [7, 8],
+ [9, 1],
+ [2, 3]
+ ];
+
+ function buildInputs(id, rows, cols, currentMat) {
+ const root = $('#' + id);
+ root.style.gridTemplateColumns = `repeat(${cols}, 54px)`;
+ root.className = 'medit';
+ let h = '';
+ for (let i = 0; i < rows; i++) {
+ for (let j = 0; j < cols; j++) {
+ const val = currentMat[i] && currentMat[i][j] !== undefined ? currentMat[i][j] : Math.floor(Math.random() * 9 + 1);
+ h += `<input type="number" id="${id}_${i}_${j}" value="${val}">`;
+ }
+ }
+ root.innerHTML = h;
+ }
+
+ function readMat(id, rows, cols) {
+ const res = [];
+ for (let i = 0; i < rows; i++) {
+ res[i] = [];
+ for (let j = 0; j < cols; j++) {
+ const inp = $(`#${id}_${i}_${j}`);
+ res[i][j] = inp ? parseInt(inp.value) || 0 : 0;
+ }
+ }
+ return res;
+ }
+
+ function syncEditors() {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ buildInputs('ma-ed', rA, cA, matA);
+ buildInputs('mb-ed', rB, cB, matB);
+ }
+
+ $('#ma-r').onchange = () => { matA = readMat('ma-ed', 2, 3); syncEditors(); };
+ $('#ma-c').onchange = () => { matA = readMat('ma-ed', 2, 3); syncEditors(); };
+ $('#mb-r').onchange = () => { matB = readMat('mb-ed', 3, 2); syncEditors(); };
+ $('#mb-c').onchange = () => { matB = readMat('mb-ed', 3, 2); syncEditors(); };
+
+ $('#mx-rand').onclick = () => {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ matA = Array.from({ length: rA }, () => Array.from({ length: cA }, () => Math.floor(Math.random() * 9 + 1)));
+ matB = Array.from({ length: rB }, () => Array.from({ length: cB }, () => Math.floor(Math.random() * 9 + 1)));
+ syncEditors();
+ };
+
+ syncEditors();
+
+ // Matris stepper motoru
+ const stMat = createStepper('st-mat', {
+ render(s, viz) {
+ if (!s.custom) return;
+ const { mA, mB, mRes, curA, curB, curR, calcText, title } = s.custom;
+
+ const renderGrid = (m, hl = null, name = '') => {
+ if (!m || !m.length) return '';
+ const rows = m.length, cols = m[0].length;
+ let g = `<div class="matw"><div class="mn">${name} (${rows}×${cols})</div><div class="mat" style="grid-template-columns: repeat(${cols}, 42px)">`;
+ for (let r = 0; r < rows; r++) {
+ for (let c = 0; c < cols; c++) {
+ let cls = 'mc';
+ if (hl && hl.some(([hr, hc]) => hr === r && hc === c)) cls += ' hl';
+ const val = m[r][c] !== null ? m[r][c] : '·';
+ g += `<div class="${cls}">${val}</div>`;
+ }
+ }
+ g += `</div></div>`;
+ return g;
+ };
+
+ let h = `<div class="mats">`;
+ if (mA) h += renderGrid(mA, curA, 'A');
+ if (mB) h += `<span class="op">${s.custom.opSym || ''}</span>` + renderGrid(mB, curB, 'B');
+ if (mRes) h += `<span class="op">=</span>` + renderGrid(mRes, curR, 'Sonuç (C)');
+ h += `</div>`;
+
+ if (calcText) {
+ h += `<div class="calc">${calcText}</div>`;
+ }
+ viz.innerHTML = h;
+ }
+ });
+
+ // Operasyonlar
+ function runMatrixOp(op) {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ const A = readMat('ma-ed', rA, cA);
+ const B = readMat('mb-ed', rB, cB);
+
+ if (op === 'topla') {
+ if (rA !== rB || cA !== cB) {
+ stMat.error(`Matris toplamı için boyutlar eşit olmalıdır! A (${rA}×${cA}) ≠ B (${rB}×${cB})`);
+ return;
+ }
+ const code = String.raw`// Matrisleri toplayıp C matrisine yazan fonksiyon
+void matrisTopla(int r, int c, int A[r][c], int B[r][c], int C[r][c]) {
+ for (int i = 0; i < r; i++) { // Satırları gez
+ for (int j = 0; j < c; j++) { // Sütunları gez
+ C[i][j] = A[i][j] + B[i][j]; // Karşılıklı elemanları topla
+ }
+ }
+}`;
+ const R = rec();
+ const C = Array.from({ length: rA }, () => Array.from({ length: cA }, () => null));
+ R.push(1, { r: rA, c: cA }, `<code>matrisTopla</code> fonksiyonuna A, B ve C matrislerinin <b>adresleri</b> gönderildi. Boyut: ${rA}×${cA}`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '+' }
+ });
+
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cA; j++) {
+ const sum = A[i][j] + B[i][j];
+ C[i][j] = sum;
+ R.push(4, { i, j, 'A[i][j]': A[i][j], 'B[i][j]': B[i][j], 'C[i][j]': sum },
+ `C[${i}][${j}] = A[${i}][${j}] + B[${i}][${j}] → <b>${A[i][j]} + ${B[i][j]} = ${sum}</b>`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(row => [...row]), opSym: '+',
+ curA: [[i, j]], curB: [[i, j]], curR: [[i, j]],
+ calcText: `C[${i}][${j}] = ${A[i][j]} + ${B[i][j]} = ${sum}`
+ }
+ });
+ }
+ }
+ R.push(6, {}, `Toplama işlemi tamamlandı! C matrisi bellekte doğrudan güncellendi.`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '+' }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'carp') {
+ if (cA !== rB) {
+ stMat.error(`Çarpma için A'nın sütunu B'nin satırına eşit olmalı! (A'nın sütunu: ${cA}, B'nin satırı: ${rB})`);
+ return;
+ }
+ const code = String.raw`// Matris çarpımı (3 iç içe döngü!)
+void matrisCarp(int rA, int cA, int cB, int A[rA][cA], int B[cA][cB], int C[rA][cB]) {
+ for (int i = 0; i < rA; i++) { // A'nın satırları
+ for (int j = 0; j < cB; j++) { // B'nin sütunları
+ C[i][j] = 0; // Kumbara sıfırlanır
+ for (int k = 0; k < cA; k++) { // Çarpıp toplayan iç sayaç
+ C[i][j] += A[i][k] * B[k][j];
+ }
+ }
+ }
+}`;
+ const R = rec();
+ const C = Array.from({ length: rA }, () => Array.from({ length: cB }, () => null));
+ R.push(1, {}, `Matris çarpımı başlıyor: (${rA}×${cA}) × (${rB}×${cB}) = (${rA}×${cB}) boyutunda bir matris üretilir.`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '×' }
+ });
+
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cB; j++) {
+ let sum = 0;
+ C[i][j] = 0;
+ R.push(4, { i, j, 'C[i][j]': 0 }, `C[${i}][${j}] hücresi hesaplanacak: A'nın ${i}. satırı ile B'nin ${j}. sütunu eşleşecek. Kumbara = 0 yapıldı.`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(r => [...r]), opSym: '×',
+ curA: Array.from({ length: cA }, (_, idx) => [i, idx]),
+ curB: Array.from({ length: rB }, (_, idx) => [idx, j]),
+ curR: [[i, j]],
+ calcText: `C[${i}][${j}] = 0`
+ }
+ });
+
+ for (let k = 0; k < cA; k++) {
+ const mul = A[i][k] * B[k][j];
+ sum += mul;
+ C[i][j] = sum;
+ R.push(6, { i, j, k, 'A[i][k]': A[i][k], 'B[k][j]': B[k][j], carpim: mul, toplam: sum },
+ `k = ${k}: A[${i}][${k}] × B[${k}][${j}] → <b>${A[i][k]} × ${B[k][j]} = ${mul}</b> (Kumbaraya eklendi → ${sum})`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(r => [...r]), opSym: '×',
+ curA: [[i, k]], curB: [[k, j]], curR: [[i, j]],
+ calcText: `C[${i}][${j}] = ... + (${A[i][k]} × ${B[k][j]}) = ${sum}`
+ }
+ });
+ }
+ }
+ }
+ R.push(9, {}, `Çarpma işlemi başarıyla tamamlandı!`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '×' }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'transpoz') {
+ const code = String.raw`// Transpoz: Satırlar sütun, sütunlar satır olur
+void transpozAl(int r, int c, int A[r][c], int T[c][r]) {
+ for (int i = 0; i < r; i++) {
+ for (int j = 0; j < c; j++) {
+ T[j][i] = A[i][j]; // i ve j yer değiştirir!
+ }
+ }
+}`;
+ const R = rec();
+ const T = Array.from({ length: cA }, () => Array.from({ length: rA }, () => null));
+ R.push(1, {}, `A matrisinin transpozu alınıyor (${rA}×${cA} → ${cA}×${rA}).`, {
+ custom: { mA: A, mRes: T, opSym: 'ᵀ' }
+ });
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cA; j++) {
+ T[j][i] = A[i][j];
+ R.push(4, { i, j, 'A[i][j]': A[i][j] },
+ `A[${i}][${j}] elemanı (${A[i][j]}), T[${j}][${i}] konumuna taşındı.`, {
+ custom: {
+ mA: A, mRes: T.map(r => [...r]), opSym: 'ᵀ',
+ curA: [[i, j]], curR: [[j, i]],
+ calcText: `T[${j}][${i}] = A[${i}][${j}] (${A[i][j]})`
+ }
+ });
+ }
+ }
+ stMat.load(R.steps, code);
+ } else if (op === 'kosegen') {
+ if (rA !== cA) {
+ stMat.error(`Köşegen toplamı için kare matris gerekir! (Şu anki: ${rA}×${cA})`);
+ return;
+ }
+ const code = String.raw`// Ana köşegen toplamı (Trace / İz)
+int kosegenToplami(int n, int A[n][n]) {
+ int toplam = 0;
+ for (int i = 0; i < n; i++) {
+ toplam += A[i][i]; // Sadece i == j olanlar!
+ }
+ return toplam;
+}`;
+ const R = rec();
+ let sum = 0;
+ R.push(1, {}, `Ana köşegen (i == j olan hücreler) toplanacak.`, {
+ custom: { mA: A, opSym: '' }
+ });
+ for (let i = 0; i < rA; i++) {
+ sum += A[i][i];
+ R.push(4, { i, 'A[i][i]': A[i][i], toplam: sum },
+ `i = ${i}: A[${i}][${i}] = <b>${A[i][i]}</b> kumbaraya eklendi → Toplam: ${sum}`, {
+ custom: {
+ mA: A, curA: [[i, i]], opSym: '',
+ calcText: `Toplam = ... + ${A[i][i]} = ${sum}`
+ }
+ });
+ }
+ R.push(6, { toplam: sum }, `Fonksiyon ${sum} değerini geri döndürdü (return toplam).`, {
+ custom: { mA: A, curA: Array.from({ length: rA }, (_, idx) => [idx, idx]), calcText: `Sonuç = ${sum}` }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'satir') {
+ const code = String.raw`// Her satırın toplamını bir diziye dolduran fonksiyon
+void satirTopla(int r, int c, int A[r][c], int sonuc[r]) {
+ for (int i = 0; i < r; i++) {
+ sonuc[i] = 0;
+ for (int j = 0; j < c; j++) {
+ sonuc[i] += A[i][j];
+ }
+ }
+}`;
+ const R = rec();
+ const resArr = Array.from({ length: rA }, () => null);
+ R.push(1, {}, `Her satır kendi içinde toplanarak sonuç dizisine aktarılacak.`, {
+ custom: { mA: A }
+ });
+ for (let i = 0; i < rA; i++) {
+ let s = 0;
+ resArr[i] = 0;
+ for (let j = 0; j < cA; j++) {
+ s += A[i][j];
+ resArr[i] = s;
+ R.push(5, { i, j, 'A[i][j]': A[i][j], 'satirToplami': s },
+ `${i}. satırın ${j}. elemanı (${A[i][j]}) eklendi → Satır ${i} toplamı: <b>${s}</b>`, {
+ custom: {
+ mA: A, curA: [[i, j]],
+ calcText: `Satır ${i} toplamı = ${s}`
+ }
+ });
+ }
+ }
+ stMat.load(R.steps, code);
+ }
+ }
+
+ $$('button[data-op]').forEach(btn => {
+ btn.onclick = () => runMatrixOp(btn.dataset.op);
+ });
+
+ // İlk açılışta toplamayı yükle
+ runMatrixOp('topla');
+})();
+
+/* ---------- dinamik matris çizimi (int **m) ---------- */
+(() => {
+ function drawDynMat() {
+ const s = parseInt($('#dm-s').value);
+ const t = parseInt($('#dm-t').value);
+ $('#dm-sv').textContent = s;
+ $('#dm-tv').textContent = t;
+
+ let h = `<div class="dm">
+ <div class="cell ptr" style="width:110px">
+ <div class="ad">&m = 0x1000</div>
+ <div class="box">0x2000</div>
+ <div class="nm">int **m</div>
+ <div class="ty">işaretçi</div>
+ </div>
+ <div class="bigarr">-></div>
+ <div class="dm-rows">`;
+
+ for (let i = 0; i < s; i++) {
+ const rowAddr = 0x3000 + i * 0x100;
+ h += `<div class="dm-row">
+ <div class="dm-rp">
+ <div><b>m[${i}]</b></div>
+ <div style="font-size:10px;color:var(--muted)">${hex(rowAddr)}</div>
+ </div>
+ <div style="font-size:18px;color:var(--muted)">-></div>
+ <div class="dm-cells">`;
+ for (let j = 0; j < t; j++) {
+ const cellAddr = rowAddr + j * 4;
+ h += `<div class="dm-c">
+ <div style="color:var(--acc2)">${i * t + j + 1}</div>
+ <div style="font-size:9px;color:#86efac">${hex(cellAddr)}</div>
+ </div>`;
+ }
+ h += `</div></div>`;
+ }
+
+ h += `</div></div>`;
+ $('#dm-viz').innerHTML = h;
+ $('#dm-info').innerHTML = `
+ <b>Bellek Haritası Açıklaması:</b><br>
+ 1. <code>m</code> (Stack'te): Satır işaretçilerini tutan dizinin adresini (0x2000) saklar.<br>
+ 2. <code>m[0] ... m[${s - 1}]</code> (Heap'te 1. tahsis): Her biri ${t} elemanlı bir satırın başlangıç adresini saklar.<br>
+ 3. Yeşil kutular (Heap'te 2. tahsisler): Gerçek sayı verilerinin tutulduğu yerdir.<br>
+ Toplam çağrılan malloc/calloc: <b>1 + ${s} = ${s + 1} kez</b>. Free ederken de tam ${s + 1} kez free() çağrılmalıdır!
+ `;
+ }
+
+ $('#dm-s').oninput = drawDynMat;
+ $('#dm-t').oninput = drawDynMat;
+ drawDynMat();
+})();
+
+/* =====================================================================
+ QUIZ SİSTEMİ
+ ===================================================================== */
+const QUIZ_DATA = {
+ basamak: [
+ {
+ q: 'C dilinde <code>284 % 10</code> işleminin sonucu nedir?',
+ o: ['28', '4', '2', '28.4'],
+ a: 1,
+ why: '<code>% 10</code> işlemi 10\'a bölümden kalanı, yani birler basamağını verir: 4.'
+ },
+ {
+ q: '<code>n = 284; n = n / 10;</code> satırı çalıştıktan sonra n kaç olur?',
+ o: ['28.4', '4', '28', '2'],
+ a: 2,
+ why: 'Tam sayı bölmesinde (integer division) küsurat atılır. 284 / 10 = 28 olur.'
+ }
+ ],
+ armstrong: [
+ {
+ q: '3 basamaklı bir sayının Armstrong olup olmadığını anlamak için her basamağın kaçıncı kuvveti alınır?',
+ o: ['2. kuvveti (karesi)', '3. kuvveti (küpü)', 'Basamağın kendi değeri kadar', 'Sabit 10. kuvveti'],
+ a: 1,
+ why: 'Kural gereği basamak sayısı kaç ise (burada 3), her rakamın o kadar kuvveti alınır.'
+ },
+ {
+ q: 'Armstrong kontrol döngüsünde neden <code>temp = sayi;</code> diyerek fotokopi alırız?',
+ o: ['Kod daha hızlı çalışsın diye', 'C dili doğrudan sayi değişkenini bölmeye izin vermez', 'Döngü sayıyı 10\'a böle böle 0 yapar; orijinal sayı en sonda karşılaştırma için lazımdır', 'Kuvvet fonksiyonu sadece temp ile çalışır'],
+ a: 2,
+ why: 'Döngü bittiğinde temp = 0 olur. Eğer sayi değişkenini kullansaydık en sonda elimizde karşılaştıracak sayı kalmazdı!'
+ }
+ ],
+ palindrom: [
+ {
+ q: '<code>ters = 12; b = 3;</code> iken <code>ters = ters * 10 + b;</code> çalışırsa yeni ters ne olur?',
+ o: ['15', '123', '36', '120'],
+ a: 1,
+ why: 'ters * 10 = 120 olur, + 3 eklenince 123 olur. Sayı sağa doğru genişletilmiş olur.'
+ }
+ ],
+ harshad: [
+ {
+ q: '24 sayısı neden bir Harshad sayısıdır?',
+ o: ['Rakamları toplamı (2+4=6) olup 24, 6\'ya tam bölündüğü için', 'Rakamları çarpımı 8 olduğu için', 'Çift sayı olduğu için', '24 tersten de 24 okunduğu için'],
+ a: 0,
+ why: '24 / (2+4) = 24 / 6 = 4 (kalan 0). Sayı rakamları toplamına tam bölündüğü için Harshad\'dır.'
+ }
+ ],
+ casus: [
+ {
+ q: 'Casus sayı algoritmasında <code>carpim</code> değişkeninin başlangıç değeri neden 0 yapılamaz?',
+ o: ['Derleyici hata verir', '0 ile başlayan çarpma işleminde sonuç daima 0 kalır', 'Toplam değişkeni ile karışır', '0 negatif sayı sayılır'],
+ a: 1,
+ why: '0 yutan elemandır! <code>carpim = 0</code> ile başlarsanız 0 * b daima 0 olur ve hiçbir zaman doğru çarpım bulunamaz.'
+ }
+ ],
+ mutlu: [
+ {
+ q: 'Mutlu sayı algoritmasında kısır döngüye düşüldüğünü (mutsuz olduğunu) hangi sayıya varınca anlarız?',
+ o: ['0', '1', '4', '13'],
+ a: 2,
+ why: 'Bütün mutsuz sayılar matematiksel olarak 4 döngüsüne (4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4) girer.'
+ }
+ ],
+ icice: [
+ {
+ q: 'Dış döngü 5 kez, iç döngü 4 kez dönüyorsa içteki kod toplam kaç kez çalışır?',
+ o: ['9', '20', '5', '1'],
+ a: 1,
+ why: 'İç içe döngülerde toplam çalışma sayısı çarpımdır: 5 × 4 = 20 kez.'
+ }
+ ],
+ math: [
+ {
+ q: 'Linux veya Mac terminalinde <code>math.h</code> kullanan C dosyasını derlerken hangi bayrak eklenmelidir?',
+ o: ['-math', '-lm', '-c', '-Wall'],
+ a: 1,
+ why: 'Matematik kütüphanesini bağlamak (link) için derleyici komutunun sonuna <code>-lm</code> eklenir.'
+ }
+ ],
+ pointer: [
+ {
+ q: '<code>int a = 10; int *p = &a; *p = 25;</code> çalıştıktan sonra <code>a</code> kaçtır?',
+ o: ['10', '25', '0x100 (adres)', 'Belirsiz'],
+ a: 1,
+ why: '<code>*p = 25;</code> demek, p\'nin gösterdiği adrese (yani a\'nın kutusuna) git ve 25 yaz demektir.'
+ },
+ {
+ q: 'Bir fonksiyonun <code>main</code> içindeki bir değişkeni değiştirebilmesi için fonksiyona ne gönderilmelidir?',
+ o: ['Değişkenin kopyası (değeri)', 'Değişkenin bellek adresi (pointer ile)', 'Değişkenin ismi tırnak içinde', 'math.h kütüphanesi'],
+ a: 1,
+ why: 'C dilinde fonksiyonlar parametreleri varsayılan olarak kopyalayarak alır. Asıl değişkeni değiştirmek için adresini (&a) göndermek şarttır.'
+ }
+ ],
+ malloc: [
+ {
+ q: '<code>calloc</code> ile <code>malloc</code> arasındaki temel fark nedir?',
+ o: ['calloc belleği sıfırlayarak (0) verir, malloc ise içindeki çöp değerlere dokunmaz', 'malloc Stack\'te, calloc Heap\'te yer açar', 'malloc free gerektirmez, calloc gerektirir', 'calloc sadece char tipleri içindir'],
+ a: 0,
+ why: 'calloc tahsis ettiği tüm baytları sıfırlar (0 ile doldurur), malloc ise hafızada ne varsa olduğu gibi bırakır (çöp değer).'
+ },
+ {
+ q: 'free(p) yapıldıktan sonra <code>p = NULL;</code> yazılmasının temel sebebi nedir?',
+ o: ['Bilgisayarı kapatmak için', 'Sarkan pointer (dangling pointer) oluşmasını ve yanlışlıkla eski adrese yazılmasını engellemek için', 'malloc hafızayı geri alsın diye', 'Sadece süs olsun diye'],
+ a: 1,
+ why: 'free edildikten sonra p hâlâ eski adresi tutar. p = NULL yaparak o adresi tamamen unutmasını ve kazara veri bozulmasını önleriz.'
+ }
+ ],
+ matris: [
+ {
+ q: '<code>int m[3][4];</code> tanımlamasında matris kaç satır ve kaç sütundan oluşur?',
+ o: ['3 sütun, 4 satır', '3 satır, 4 sütun', '12 satır, 1 sütun', 'Yalnızca 7 eleman'],
+ a: 1,
+ why: 'C dilinde matrislerde <code>m[satır][sütun]</code> sırası geçerlidir. Yani 3 satır, 4 sütun.'
+ }
+ ]
+};
+
+function renderQuizzes() {
+ $$('.quiz').forEach(el => {
+ const qid = el.dataset.quiz;
+ const list = QUIZ_DATA[qid];
+ if (!list) return;
+
+ let h = `<h4> Kendini Sına (${qid.toUpperCase()})</h4>`;
+ list.forEach((item, qIdx) => {
+ h += `<div class="qq" id="qq-${qid}-${qIdx}">
+ <div class="qt">${qIdx + 1}. ${item.q}</div>
+ <div class="opts">
+ ${item.o.map((opt, oIdx) => `<button class="opt" data-qid="${qid}" data-q="${qIdx}" data-o="${oIdx}">${opt}</button>`).join('')}
+ </div>
+ <div class="why">${item.why}</div>
+ </div>`;
+ });
+ el.innerHTML = h;
+ });
+
+ // Seçenek tıklama dinleyicileri
+ $$('.qq .opt').forEach(btn => {
+ btn.onclick = () => {
+ const qid = btn.dataset.qid;
+ const qIdx = parseInt(btn.dataset.q);
+ const oIdx = parseInt(btn.dataset.o);
+ const data = QUIZ_DATA[qid][qIdx];
+ const qqEl = $(`#qq-${qid}-${qIdx}`);
+
+ if (qqEl.classList.contains('answered')) return; // Bir kez yanıtlandıysa kilitle
+
+ qqEl.classList.add('answered');
+ const allBtns = $$('.opt', qqEl);
+
+ if (oIdx === data.a) {
+ btn.classList.add('right');
+ } else {
+ btn.classList.add('wrong');
+ allBtns[data.a].classList.add('right');
+ }
+ };
+ });
+}
+renderQuizzes();
+
+
+// Tema Değiştirici (Aydınlık / Karanlık Mod)
+(() => {
+ const toggleBtn = document.getElementById('themeToggle');
+ const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+ const savedTheme = localStorage.getItem('site_theme');
+ 
+ function applyTheme(theme) {
+ if (theme === 'dark') {
+ document.documentElement.setAttribute('data-theme', 'dark');
+ if (toggleBtn) toggleBtn.innerHTML = ' Aydınlık Mod';
+ } else {
+ document.documentElement.removeAttribute('data-theme');
+ if (toggleBtn) toggleBtn.innerHTML = ' Karanlık Mod';
+ }
+ localStorage.setItem('site_theme', theme);
+ }
+ 
+ // Varsayılan: Beyaz / Açık tema
+ const initialTheme = savedTheme || 'light';
+ applyTheme(initialTheme);
+ 
+ if (toggleBtn) {
+ toggleBtn.onclick = () => {
+ const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+ applyTheme(isDark ? 'light' : 'dark');
+ if (typeof ALL_ST !== 'undefined') {
+ ALL_ST.forEach(s => s.rerender && s.rerender());
+ }
+ };
+ }
+})();
+
+/* =====================================================================
+ SAYFA İÇİ GEZİNME & MENÜ
+ ===================================================================== */
+// Menü aç / kapat (mobil)
+const menuBtn = $('#menuBtn');
+const side = $('#side');
+menuBtn.onclick = () => side.classList.toggle('open');
+
+// Linke tıklayınca mobilde menüyü kapat
+$$('#side a').forEach(a => {
+ a.onclick = () => side.classList.remove('open');
+});
+
+// Kaydırma çubuğu ve aktif menü güncellemesi
+window.onscroll = () => {
+ const winScroll = document.documentElement.scrollTop;
+ const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+ const scrolled = (winScroll / height) * 100;
+ $('#progress').style.width = scrolled + '%';
+
+ // Aktif bölüm
+ const sections = $$('section');
+ let curSec = '';
+ sections.forEach(sec => {
+ const top = sec.offsetTop - 120;
+ if (winScroll >= top) curSec = sec.id;
+ });
+
+ $$('#side a').forEach(a => {
+ a.classList.toggle('active', a.getAttribute('href') === '#' + curSec);
+ });
+};
+</script>
+</body>
+</html>
+
+<script>
+/* =====================================================================
+ 10. MALLOC & CALLOC HEAP SİMÜLATÖRÜ
+ ===================================================================== */
+(() => {
+ const TOTAL_CELLS = 24;
+ const BASE_ADDR = 0x5000;
+ const CELL_SIZE = 4; // int = 4 bytes
+
+ // Bellek durumu modeli
+ let heapState = Array.from({ length: TOTAL_CELLS }, (_, i) => ({
+ addr: BASE_ADDR + i * CELL_SIZE,
+ val: '?', // Çöp değer
+ owner: null, // 'p' veya null
+ isLeaked: false,
+ isFreed: false,
+ isDangling: false
+ }));
+
+ let pointerVal = null; // null veya 0x5000 gibi adres
+ let pointerBlocks = 0; // Kiralandığı anki eleman sayısı n
+ let logHistory = [];
+
+ function log(msg, type = 'info') {
+ const time = new Date().toLocaleTimeString('tr-TR');
+ logHistory.unshift(`[${time}] ${msg}`);
+ if (logHistory.length > 30) logHistory.pop();
+ const lEl = $('#hp-log');
+ if (lEl) {
+ lEl.innerHTML = logHistory.map(line => `<div>${line}</div>`).join('');
+ }
+ }
+
+ function setMsg(html, type = '') {
+ const m = $('#hp-msg');
+ m.className = 'hmsg ' + type;
+ m.innerHTML = html;
+ }
+
+ function renderHeap() {
+ const hEl = $('#hp-heap');
+ const pEl = $('#hp-p');
+ const pStateEl = $('#hp-pstate');
+
+ pEl.textContent = pointerVal ? hex(pointerVal) : 'NULL';
+
+ if (pointerVal) {
+ pStateEl.innerHTML = `<span class="ok">● Adres gösteriyor (${hex(pointerVal)})</span><br><small class="muted">${pointerBlocks} adet int (${pointerBlocks * 4} bayt)</small>`;
+ } else {
+ pStateEl.innerHTML = `<span class="muted">○ Boş (NULL)</span>`;
+ }
+
+ let h = '';
+ heapState.forEach((c, idx) => {
+ let cls = 'hc';
+ if (c.owner === 'p') cls += ' used';
+ else if (c.isLeaked) cls += ' leak';
+ else if (c.isFreed) cls += ' freed';
+
+ let indStr = '';
+ if (pointerVal && c.owner === 'p') {
+ const offset = (c.addr - pointerVal) / CELL_SIZE;
+ indStr = `p[${offset}]`;
+ }
+
+ h += `<div class="${cls}" id="hc-${idx}">
+ <div class="ha">${hex(c.addr)}</div>
+ <div class="hi">${indStr}</div>
+ <div class="hv">${c.val}</div>
+ </div>`;
+ });
+ hEl.innerHTML = h;
+ }
+
+ function doMalloc(isCalloc = false) {
+ const n = parseInt($('#hp-n').value);
+ if (!isInt(n, 1, 12)) {
+ setMsg('Lütfen 1 ile 12 arasında bir sayı seçin.', 'w');
+ return;
+ }
+
+ // Zaten bir yer tutuyorsa ve free edilmediyse sızıntı olur!
+ let leakOccurred = false;
+ if (pointerVal !== null) {
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ c.owner = null;
+ c.isLeaked = true;
+ leakOccurred = true;
+ }
+ });
+ if (leakOccurred) {
+ log(`Dikkat: UYARI: Önceki alan free() edilmeden p'ye yeni adres atandı! Bellek sızıntısı (Memory Leak)!`, 'bad');
+ }
+ }
+
+ // Heap'te n blokluk boş yer ara
+ let startIdx = -1;
+ for (let i = 0; i <= TOTAL_CELLS - n; i++) {
+ let fit = true;
+ for (let j = 0; j < n; j++) {
+ if (heapState[i + j].owner !== null || heapState[i + j].isLeaked) {
+ fit = false;
+ break;
+ }
+ }
+ if (fit) {
+ startIdx = i;
+ break;
+ }
+ }
+
+ if (startIdx === -1) {
+ setMsg(`(Yanlış) <b>NULL döndü!</b> Heap üzerinde peş peşe boş ${n} blok bulunamadı!`, 'e');
+ log(`p = NULL (bellek yetersiz)`, 'bad');
+ pointerVal = null;
+ pointerBlocks = 0;
+ renderHeap();
+ return;
+ }
+
+ // Alanı tahsis et
+ for (let j = 0; j < n; j++) {
+ const cell = heapState[startIdx + j];
+ cell.owner = 'p';
+ cell.isFreed = false;
+ cell.isLeaked = false;
+ if (isCalloc) {
+ cell.val = '0';
+ } else {
+ // Rastgele çöp değer
+ cell.val = Math.floor(Math.random() * 899 + 100);
+ }
+ }
+
+ pointerVal = heapState[startIdx].addr;
+ pointerBlocks = n;
+
+ const fnName = isCalloc ? `calloc(${n}, sizeof(int))` : `malloc(${n} * sizeof(int))`;
+ log(`int *p = (int*) ${fnName}; // Adres: ${hex(pointerVal)}`);
+
+ if (leakOccurred) {
+ setMsg(`Uyarı: <b>BELLEK SIZINTISI OLUŞTU!</b> Önceki kiraladığınız alanı <code>free(p)</code> yapmadan yeni yer kiraladınız. Eski kutuların adresi kayboldu, sonsuza dek kilitli kaldı (kırmızı alanlar)!<br>Yeni alan: <b>${hex(pointerVal)}</b>`, 'w');
+ } else if (isCalloc) {
+ setMsg(`(Doğru) <b>calloc çalıştı:</b> Heap'ten ${n} kutu (${n * 4} bayt) kiralandı ve her kutu <b>0 ile temizlendi</b>!`, 'g');
+ } else {
+ setMsg(` <b>malloc çalıştı:</b> Heap'ten ${n} kutu (${n * 4} bayt) kiralandı. Kutulardaki sayılara dikkat et: <b>çöp (rastgele) değerler</b> var! Temizlenmedi.`, 'g');
+ }
+
+ renderHeap();
+ }
+
+ function doFree() {
+ if (pointerVal === null) {
+ setMsg(`Dikkat: <b>p zaten NULL!</b> Boş pointer free edilemez (zararsız ama bir şey yapmaz).`, 'w');
+ log(`free(p); // p zaten NULL idi.`);
+ return;
+ }
+
+ let freedCount = 0;
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ c.owner = null;
+ c.isFreed = true;
+ c.val = '';
+ freedCount++;
+ }
+ });
+
+ log(`free(p); // ${hex(pointerVal)} adresindeki ${freedCount} kutu sisteme iade edildi.`);
+ setMsg(` <b>free(p) çalıştı:</b> Depo anahtarı teslim edildi. Ancak dikkat! <b>p hâlâ ${hex(pointerVal)} adresini biliyor!</b> Buna <i>sarkan pointer (dangling pointer)</i> denir. Güvenlik için hemen arkasından <code>p = NULL;</code> yapmalısın.`, 'g');
+ renderHeap();
+ }
+
+ function doNull() {
+ pointerVal = null;
+ pointerBlocks = 0;
+ log(`p = NULL; // Artık hiçbir yeri göstermiyor.`);
+ setMsg(` <b>p = NULL yapıldı:</b> Artık pointer boş bir adresi tutuyor. Yanlışlıkla eski adrese yazma riski engellendi.`, 'g');
+ renderHeap();
+ }
+
+ function doWrite() {
+ const idx = parseInt($('#hp-i').value);
+ const val = parseInt($('#hp-v').value);
+
+ if (pointerVal === null) {
+ setMsg(` <b>SEGMENTATION FAULT (ÇÖKME)!</b> <code>p</code> şu anda NULL! Olmayan bir adrese yazmaya çalıştın!`, 'e');
+ log(`CRASH: *p = ${val} (p NULL iken erişim)`, 'bad');
+ return;
+ }
+
+ // Sarkan pointer kontrolü: p bir adres gösteriyor ama o adres artık p'ye ait değilse
+ const targetAddr = pointerVal + idx * CELL_SIZE;
+ const targetCell = heapState.find(c => c.addr === targetAddr);
+
+ if (!targetCell) {
+ setMsg(` <b>BELLEK TAŞMASI (BUFFER OVERFLOW)!</b> Heap sınırlarının çok dışına çıktın! (${hex(targetAddr)})`, 'e');
+ log(`CRASH: p[${idx}] geçersiz bellek sınırı`, 'bad');
+ return;
+ }
+
+ if (targetCell.owner !== 'p') {
+ if (targetCell.isFreed) {
+ setMsg(`Uyarı: <b>USE-AFTER-FREE HATASI!</b> Teslim ettiğin (free edilmiş) depoya kaçak eşya koymaya çalıştın! Çok tehlikeli bir güvenlik açığıdır.`, 'e');
+ log(`HATA: p[${idx}] free edilmiş adrese yazıldı!`, 'bad');
+ } else {
+ setMsg(`Uyarı: <b>BELLEK TAŞMASI!</b> Kiraladığın sınır ${pointerBlocks} elemandı, sen <code>p[${idx}]</code> indisine yazmaya çalıştın!`, 'e');
+ log(`HATA: Sınır dışı yazım: p[${idx}]`, 'bad');
+ }
+ targetCell.val = `<span class="bad">${val}</span>`;
+ renderHeap();
+ return;
+ }
+
+ targetCell.val = val;
+ log(`p[${idx}] = ${val}; // Adres: ${hex(targetAddr)}`);
+ setMsg(` <b>Yazıldı:</b> <code>p[${idx}] = ${val}</code> → ${hex(targetAddr)} adresindeki kutunun içine <b>${val}</b> kondu.`, 'g');
+ renderHeap();
+ }
+
+ function doFill() {
+ if (pointerVal === null || pointerBlocks === 0) {
+ setMsg(`Önce malloc veya calloc ile yer kirala!`, 'w');
+ return;
+ }
+ for (let i = 0; i < pointerBlocks; i++) {
+ const addr = pointerVal + i * CELL_SIZE;
+ const cell = heapState.find(c => c.addr === addr);
+ if (cell && cell.owner === 'p') {
+ cell.val = i * 10;
+ }
+ }
+ log(`for (int i = 0; i < ${pointerBlocks}; i++) p[i] = i * 10;`);
+ setMsg(` <b>for döngüsü bitti:</b> ${pointerBlocks} elemanın hepsi değerlerle dolduruldu!`, 'g');
+ renderHeap();
+ }
+
+ function doRealloc() {
+ const n = parseInt($('#hp-n').value);
+ if (pointerVal === null) {
+ setMsg(`p NULL iken realloc çağırırsan malloc(${n}) gibi davranır.`, 'info');
+ doMalloc(false);
+ return;
+ }
+
+ log(`p = (int*) realloc(p, ${n} * sizeof(int));`);
+
+ // Basit simülasyon: Eski değerleri topla
+ const oldVals = [];
+ heapState.forEach(c => {
+ if (c.owner === 'p') {
+ oldVals.push(c.val);
+ c.owner = null;
+ c.isFreed = true;
+ }
+ });
+
+ // Yeni n kadar yer ara
+ let startIdx = -1;
+ for (let i = 0; i <= TOTAL_CELLS - n; i++) {
+ let fit = true;
+ for (let j = 0; j < n; j++) {
+ if (heapState[i + j].owner !== null && !heapState[i + j].isFreed) {
+ fit = false;
+ break;
+ }
+ }
+ if (fit) {
+ startIdx = i;
+ break;
+ }
+ }
+
+ if (startIdx === -1) {
+ setMsg(`(Yanlış) <b>realloc başarısız:</b> Yeterli ardışık alan bulunamadı. Eski bellek bozulmadı.`, 'e');
+ renderHeap();
+ return;
+ }
+
+ for (let j = 0; j < n; j++) {
+ const cell = heapState[startIdx + j];
+ cell.owner = 'p';
+ cell.isFreed = false;
+ cell.isLeaked = false;
+ cell.val = j < oldVals.length ? oldVals[j] : Math.floor(Math.random() * 899 + 100);
+ }
+
+ pointerVal = heapState[startIdx].addr;
+ pointerBlocks = n;
+
+ setMsg(` <b>realloc tamamlandı:</b> Bellek boyutu ${n} elemana uyarlandı. Eski veriler korundu, gerekiyorsa yeni kutular eklendi.`, 'g');
+ renderHeap();
+ }
+
+ function doReset() {
+ heapState = Array.from({ length: TOTAL_CELLS }, (_, i) => ({
+ addr: BASE_ADDR + i * CELL_SIZE,
+ val: '?',
+ owner: null,
+ isLeaked: false,
+ isFreed: false,
+ isDangling: false
+ }));
+ pointerVal = null;
+ pointerBlocks = 0;
+ logHistory = [];
+ setMsg('Bellek simülatörü sıfırlandı.');
+ $('#hp-log').innerHTML = '';
+ renderHeap();
+ }
+
+ $('#hp-malloc').onclick = () => doMalloc(false);
+ $('#hp-calloc').onclick = () => doMalloc(true);
+ $('#hp-free').onclick = doFree;
+ $('#hp-null').onclick = doNull;
+ $('#hp-write').onclick = doWrite;
+ $('#hp-fill').onclick = doFill;
+ $('#hp-realloc').onclick = doRealloc;
+ $('#hp-reset').onclick = doReset;
+
+ renderHeap();
+})();
+
+/* =====================================================================
+ 11. FONKSİYONLARLA MATRİSLER LABORATUVARI
+ ===================================================================== */
+(() => {
+ // Matris boyut seçeneklerini doldur
+ ['ma-r', 'ma-c', 'mb-r', 'mb-c'].forEach(id => {
+ const sel = $('#' + id);
+ if (!sel) return;
+ sel.innerHTML = [2, 3, 4].map(v => `<option value="${v}">${v}</option>`).join('');
+ });
+
+ $('#ma-r').value = '2';
+ $('#ma-c').value = '3';
+ $('#mb-r').value = '3';
+ $('#mb-c').value = '2';
+
+ let matA = [
+ [1, 2, 3],
+ [4, 5, 6]
+ ];
+ let matB = [
+ [7, 8],
+ [9, 1],
+ [2, 3]
+ ];
+
+ function buildInputs(id, rows, cols, currentMat) {
+ const root = $('#' + id);
+ root.style.gridTemplateColumns = `repeat(${cols}, 54px)`;
+ root.className = 'medit';
+ let h = '';
+ for (let i = 0; i < rows; i++) {
+ for (let j = 0; j < cols; j++) {
+ const val = currentMat[i] && currentMat[i][j] !== undefined ? currentMat[i][j] : Math.floor(Math.random() * 9 + 1);
+ h += `<input type="number" id="${id}_${i}_${j}" value="${val}">`;
+ }
+ }
+ root.innerHTML = h;
+ }
+
+ function readMat(id, rows, cols) {
+ const res = [];
+ for (let i = 0; i < rows; i++) {
+ res[i] = [];
+ for (let j = 0; j < cols; j++) {
+ const inp = $(`#${id}_${i}_${j}`);
+ res[i][j] = inp ? parseInt(inp.value) || 0 : 0;
+ }
+ }
+ return res;
+ }
+
+ function syncEditors() {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ buildInputs('ma-ed', rA, cA, matA);
+ buildInputs('mb-ed', rB, cB, matB);
+ }
+
+ $('#ma-r').onchange = () => { matA = readMat('ma-ed', 2, 3); syncEditors(); };
+ $('#ma-c').onchange = () => { matA = readMat('ma-ed', 2, 3); syncEditors(); };
+ $('#mb-r').onchange = () => { matB = readMat('mb-ed', 3, 2); syncEditors(); };
+ $('#mb-c').onchange = () => { matB = readMat('mb-ed', 3, 2); syncEditors(); };
+
+ $('#mx-rand').onclick = () => {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ matA = Array.from({ length: rA }, () => Array.from({ length: cA }, () => Math.floor(Math.random() * 9 + 1)));
+ matB = Array.from({ length: rB }, () => Array.from({ length: cB }, () => Math.floor(Math.random() * 9 + 1)));
+ syncEditors();
+ };
+
+ syncEditors();
+
+ // Matris stepper motoru
+ const stMat = createStepper('st-mat', {
+ render(s, viz) {
+ if (!s.custom) return;
+ const { mA, mB, mRes, curA, curB, curR, calcText, title } = s.custom;
+
+ const renderGrid = (m, hl = null, name = '') => {
+ if (!m || !m.length) return '';
+ const rows = m.length, cols = m[0].length;
+ let g = `<div class="matw"><div class="mn">${name} (${rows}×${cols})</div><div class="mat" style="grid-template-columns: repeat(${cols}, 42px)">`;
+ for (let r = 0; r < rows; r++) {
+ for (let c = 0; c < cols; c++) {
+ let cls = 'mc';
+ if (hl && hl.some(([hr, hc]) => hr === r && hc === c)) cls += ' hl';
+ const val = m[r][c] !== null ? m[r][c] : '·';
+ g += `<div class="${cls}">${val}</div>`;
+ }
+ }
+ g += `</div></div>`;
+ return g;
+ };
+
+ let h = `<div class="mats">`;
+ if (mA) h += renderGrid(mA, curA, 'A');
+ if (mB) h += `<span class="op">${s.custom.opSym || ''}</span>` + renderGrid(mB, curB, 'B');
+ if (mRes) h += `<span class="op">=</span>` + renderGrid(mRes, curR, 'Sonuç (C)');
+ h += `</div>`;
+
+ if (calcText) {
+ h += `<div class="calc">${calcText}</div>`;
+ }
+ viz.innerHTML = h;
+ }
+ });
+
+ // Operasyonlar
+ function runMatrixOp(op) {
+ const rA = parseInt($('#ma-r').value), cA = parseInt($('#ma-c').value);
+ const rB = parseInt($('#mb-r').value), cB = parseInt($('#mb-c').value);
+ const A = readMat('ma-ed', rA, cA);
+ const B = readMat('mb-ed', rB, cB);
+
+ if (op === 'topla') {
+ if (rA !== rB || cA !== cB) {
+ stMat.error(`Matris toplamı için boyutlar eşit olmalıdır! A (${rA}×${cA}) ≠ B (${rB}×${cB})`);
+ return;
+ }
+ const code = String.raw`// Matrisleri toplayıp C matrisine yazan fonksiyon
+void matrisTopla(int r, int c, int A[r][c], int B[r][c], int C[r][c]) {
+ for (int i = 0; i < r; i++) { // Satırları gez
+ for (int j = 0; j < c; j++) { // Sütunları gez
+ C[i][j] = A[i][j] + B[i][j]; // Karşılıklı elemanları topla
+ }
+ }
+}`;
+ const R = rec();
+ const C = Array.from({ length: rA }, () => Array.from({ length: cA }, () => null));
+ R.push(1, { r: rA, c: cA }, `<code>matrisTopla</code> fonksiyonuna A, B ve C matrislerinin <b>adresleri</b> gönderildi. Boyut: ${rA}×${cA}`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '+' }
+ });
+
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cA; j++) {
+ const sum = A[i][j] + B[i][j];
+ C[i][j] = sum;
+ R.push(4, { i, j, 'A[i][j]': A[i][j], 'B[i][j]': B[i][j], 'C[i][j]': sum },
+ `C[${i}][${j}] = A[${i}][${j}] + B[${i}][${j}] → <b>${A[i][j]} + ${B[i][j]} = ${sum}</b>`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(row => [...row]), opSym: '+',
+ curA: [[i, j]], curB: [[i, j]], curR: [[i, j]],
+ calcText: `C[${i}][${j}] = ${A[i][j]} + ${B[i][j]} = ${sum}`
+ }
+ });
+ }
+ }
+ R.push(6, {}, `Toplama işlemi tamamlandı! C matrisi bellekte doğrudan güncellendi.`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '+' }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'carp') {
+ if (cA !== rB) {
+ stMat.error(`Çarpma için A'nın sütunu B'nin satırına eşit olmalı! (A'nın sütunu: ${cA}, B'nin satırı: ${rB})`);
+ return;
+ }
+ const code = String.raw`// Matris çarpımı (3 iç içe döngü!)
+void matrisCarp(int rA, int cA, int cB, int A[rA][cA], int B[cA][cB], int C[rA][cB]) {
+ for (int i = 0; i < rA; i++) { // A'nın satırları
+ for (int j = 0; j < cB; j++) { // B'nin sütunları
+ C[i][j] = 0; // Kumbara sıfırlanır
+ for (int k = 0; k < cA; k++) { // Çarpıp toplayan iç sayaç
+ C[i][j] += A[i][k] * B[k][j];
+ }
+ }
+ }
+}`;
+ const R = rec();
+ const C = Array.from({ length: rA }, () => Array.from({ length: cB }, () => null));
+ R.push(1, {}, `Matris çarpımı başlıyor: (${rA}×${cA}) × (${rB}×${cB}) = (${rA}×${cB}) boyutunda bir matris üretilir.`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '×' }
+ });
+
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cB; j++) {
+ let sum = 0;
+ C[i][j] = 0;
+ R.push(4, { i, j, 'C[i][j]': 0 }, `C[${i}][${j}] hücresi hesaplanacak: A'nın ${i}. satırı ile B'nin ${j}. sütunu eşleşecek. Kumbara = 0 yapıldı.`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(r => [...r]), opSym: '×',
+ curA: Array.from({ length: cA }, (_, idx) => [i, idx]),
+ curB: Array.from({ length: rB }, (_, idx) => [idx, j]),
+ curR: [[i, j]],
+ calcText: `C[${i}][${j}] = 0`
+ }
+ });
+
+ for (let k = 0; k < cA; k++) {
+ const mul = A[i][k] * B[k][j];
+ sum += mul;
+ C[i][j] = sum;
+ R.push(6, { i, j, k, 'A[i][k]': A[i][k], 'B[k][j]': B[k][j], carpim: mul, toplam: sum },
+ `k = ${k}: A[${i}][${k}] × B[${k}][${j}] → <b>${A[i][k]} × ${B[k][j]} = ${mul}</b> (Kumbaraya eklendi → ${sum})`, {
+ custom: {
+ mA: A, mB: B, mRes: C.map(r => [...r]), opSym: '×',
+ curA: [[i, k]], curB: [[k, j]], curR: [[i, j]],
+ calcText: `C[${i}][${j}] = ... + (${A[i][k]} × ${B[k][j]}) = ${sum}`
+ }
+ });
+ }
+ }
+ }
+ R.push(9, {}, `Çarpma işlemi başarıyla tamamlandı!`, {
+ custom: { mA: A, mB: B, mRes: C, opSym: '×' }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'transpoz') {
+ const code = String.raw`// Transpoz: Satırlar sütun, sütunlar satır olur
+void transpozAl(int r, int c, int A[r][c], int T[c][r]) {
+ for (int i = 0; i < r; i++) {
+ for (int j = 0; j < c; j++) {
+ T[j][i] = A[i][j]; // i ve j yer değiştirir!
+ }
+ }
+}`;
+ const R = rec();
+ const T = Array.from({ length: cA }, () => Array.from({ length: rA }, () => null));
+ R.push(1, {}, `A matrisinin transpozu alınıyor (${rA}×${cA} → ${cA}×${rA}).`, {
+ custom: { mA: A, mRes: T, opSym: 'ᵀ' }
+ });
+ for (let i = 0; i < rA; i++) {
+ for (let j = 0; j < cA; j++) {
+ T[j][i] = A[i][j];
+ R.push(4, { i, j, 'A[i][j]': A[i][j] },
+ `A[${i}][${j}] elemanı (${A[i][j]}), T[${j}][${i}] konumuna taşındı.`, {
+ custom: {
+ mA: A, mRes: T.map(r => [...r]), opSym: 'ᵀ',
+ curA: [[i, j]], curR: [[j, i]],
+ calcText: `T[${j}][${i}] = A[${i}][${j}] (${A[i][j]})`
+ }
+ });
+ }
+ }
+ stMat.load(R.steps, code);
+ } else if (op === 'kosegen') {
+ if (rA !== cA) {
+ stMat.error(`Köşegen toplamı için kare matris gerekir! (Şu anki: ${rA}×${cA})`);
+ return;
+ }
+ const code = String.raw`// Ana köşegen toplamı (Trace / İz)
+int kosegenToplami(int n, int A[n][n]) {
+ int toplam = 0;
+ for (int i = 0; i < n; i++) {
+ toplam += A[i][i]; // Sadece i == j olanlar!
+ }
+ return toplam;
+}`;
+ const R = rec();
+ let sum = 0;
+ R.push(1, {}, `Ana köşegen (i == j olan hücreler) toplanacak.`, {
+ custom: { mA: A, opSym: '' }
+ });
+ for (let i = 0; i < rA; i++) {
+ sum += A[i][i];
+ R.push(4, { i, 'A[i][i]': A[i][i], toplam: sum },
+ `i = ${i}: A[${i}][${i}] = <b>${A[i][i]}</b> kumbaraya eklendi → Toplam: ${sum}`, {
+ custom: {
+ mA: A, curA: [[i, i]], opSym: '',
+ calcText: `Toplam = ... + ${A[i][i]} = ${sum}`
+ }
+ });
+ }
+ R.push(6, { toplam: sum }, `Fonksiyon ${sum} değerini geri döndürdü (return toplam).`, {
+ custom: { mA: A, curA: Array.from({ length: rA }, (_, idx) => [idx, idx]), calcText: `Sonuç = ${sum}` }
+ });
+ stMat.load(R.steps, code);
+ } else if (op === 'satir') {
+ const code = String.raw`// Her satırın toplamını bir diziye dolduran fonksiyon
+void satirTopla(int r, int c, int A[r][c], int sonuc[r]) {
+ for (int i = 0; i < r; i++) {
+ sonuc[i] = 0;
+ for (int j = 0; j < c; j++) {
+ sonuc[i] += A[i][j];
+ }
+ }
+}`;
+ const R = rec();
+ const resArr = Array.from({ length: rA }, () => null);
+ R.push(1, {}, `Her satır kendi içinde toplanarak sonuç dizisine aktarılacak.`, {
+ custom: { mA: A }
+ });
+ for (let i = 0; i < rA; i++) {
+ let s = 0;
+ resArr[i] = 0;
+ for (let j = 0; j < cA; j++) {
+ s += A[i][j];
+ resArr[i] = s;
+ R.push(5, { i, j, 'A[i][j]': A[i][j], 'satirToplami': s },
+ `${i}. satırın ${j}. elemanı (${A[i][j]}) eklendi → Satır ${i} toplamı: <b>${s}</b>`, {
+ custom: {
+ mA: A, curA: [[i, j]],
+ calcText: `Satır ${i} toplamı = ${s}`
+ }
+ });
+ }
+ }
+ stMat.load(R.steps, code);
+ }
+ }
+
+ $$('button[data-op]').forEach(btn => {
+ btn.onclick = () => runMatrixOp(btn.dataset.op);
+ });
+
+ // İlk açılışta toplamayı yükle
+ runMatrixOp('topla');
+})();
+
+/* ---------- dinamik matris çizimi (int **m) ---------- */
+(() => {
+ function drawDynMat() {
+ const s = parseInt($('#dm-s').value);
+ const t = parseInt($('#dm-t').value);
+ $('#dm-sv').textContent = s;
+ $('#dm-tv').textContent = t;
+
+ let h = `<div class="dm">
+ <div class="cell ptr" style="width:110px">
+ <div class="ad">&m = 0x1000</div>
+ <div class="box">0x2000</div>
+ <div class="nm">int **m</div>
+ <div class="ty">işaretçi</div>
+ </div>
+ <div class="bigarr">-></div>
+ <div class="dm-rows">`;
+
+ for (let i = 0; i < s; i++) {
+ const rowAddr = 0x3000 + i * 0x100;
+ h += `<div class="dm-row">
+ <div class="dm-rp">
+ <div><b>m[${i}]</b></div>
+ <div style="font-size:10px;color:var(--muted)">${hex(rowAddr)}</div>
+ </div>
+ <div style="font-size:18px;color:var(--muted)">-></div>
+ <div class="dm-cells">`;
+ for (let j = 0; j < t; j++) {
+ const cellAddr = rowAddr + j * 4;
+ h += `<div class="dm-c">
+ <div style="color:var(--acc2)">${i * t + j + 1}</div>
+ <div style="font-size:9px;color:#86efac">${hex(cellAddr)}</div>
+ </div>`;
+ }
+ h += `</div></div>`;
+ }
+
+ h += `</div></div>`;
+ $('#dm-viz').innerHTML = h;
+ $('#dm-info').innerHTML = `
+ <b>Bellek Haritası Açıklaması:</b><br>
+ 1. <code>m</code> (Stack'te): Satır işaretçilerini tutan dizinin adresini (0x2000) saklar.<br>
+ 2. <code>m[0] ... m[${s - 1}]</code> (Heap'te 1. tahsis): Her biri ${t} elemanlı bir satırın başlangıç adresini saklar.<br>
+ 3. Yeşil kutular (Heap'te 2. tahsisler): Gerçek sayı verilerinin tutulduğu yerdir.<br>
+ Toplam çağrılan malloc/calloc: <b>1 + ${s} = ${s + 1} kez</b>. Free ederken de tam ${s + 1} kez free() çağrılmalıdır!
+ `;
+ }
+
+ $('#dm-s').oninput = drawDynMat;
+ $('#dm-t').oninput = drawDynMat;
+ drawDynMat();
+})();
+
+/* =====================================================================
+ QUIZ SİSTEMİ
+ ===================================================================== */
+const QUIZ_DATA = {
+ basamak: [
+ {
+ q: 'C dilinde <code>284 % 10</code> işleminin sonucu nedir?',
+ o: ['28', '4', '2', '28.4'],
+ a: 1,
+ why: '<code>% 10</code> işlemi 10\'a bölümden kalanı, yani birler basamağını verir: 4.'
+ },
+ {
+ q: '<code>n = 284; n = n / 10;</code> satırı çalıştıktan sonra n kaç olur?',
+ o: ['28.4', '4', '28', '2'],
+ a: 2,
+ why: 'Tam sayı bölmesinde (integer division) küsurat atılır. 284 / 10 = 28 olur.'
+ }
+ ],
+ armstrong: [
+ {
+ q: '3 basamaklı bir sayının Armstrong olup olmadığını anlamak için her basamağın kaçıncı kuvveti alınır?',
+ o: ['2. kuvveti (karesi)', '3. kuvveti (küpü)', 'Basamağın kendi değeri kadar', 'Sabit 10. kuvveti'],
+ a: 1,
+ why: 'Kural gereği basamak sayısı kaç ise (burada 3), her rakamın o kadar kuvveti alınır.'
+ },
+ {
+ q: 'Armstrong kontrol döngüsünde neden <code>temp = sayi;</code> diyerek fotokopi alırız?',
+ o: ['Kod daha hızlı çalışsın diye', 'C dili doğrudan sayi değişkenini bölmeye izin vermez', 'Döngü sayıyı 10\'a böle böle 0 yapar; orijinal sayı en sonda karşılaştırma için lazımdır', 'Kuvvet fonksiyonu sadece temp ile çalışır'],
+ a: 2,
+ why: 'Döngü bittiğinde temp = 0 olur. Eğer sayi değişkenini kullansaydık en sonda elimizde karşılaştıracak sayı kalmazdı!'
+ }
+ ],
+ palindrom: [
+ {
+ q: '<code>ters = 12; b = 3;</code> iken <code>ters = ters * 10 + b;</code> çalışırsa yeni ters ne olur?',
+ o: ['15', '123', '36', '120'],
+ a: 1,
+ why: 'ters * 10 = 120 olur, + 3 eklenince 123 olur. Sayı sağa doğru genişletilmiş olur.'
+ }
+ ],
+ harshad: [
+ {
+ q: '24 sayısı neden bir Harshad sayısıdır?',
+ o: ['Rakamları toplamı (2+4=6) olup 24, 6\'ya tam bölündüğü için', 'Rakamları çarpımı 8 olduğu için', 'Çift sayı olduğu için', '24 tersten de 24 okunduğu için'],
+ a: 0,
+ why: '24 / (2+4) = 24 / 6 = 4 (kalan 0). Sayı rakamları toplamına tam bölündüğü için Harshad\'dır.'
+ }
+ ],
+ casus: [
+ {
+ q: 'Casus sayı algoritmasında <code>carpim</code> değişkeninin başlangıç değeri neden 0 yapılamaz?',
+ o: ['Derleyici hata verir', '0 ile başlayan çarpma işleminde sonuç daima 0 kalır', 'Toplam değişkeni ile karışır', '0 negatif sayı sayılır'],
+ a: 1,
+ why: '0 yutan elemandır! <code>carpim = 0</code> ile başlarsanız 0 * b daima 0 olur ve hiçbir zaman doğru çarpım bulunamaz.'
+ }
+ ],
+ mutlu: [
+ {
+ q: 'Mutlu sayı algoritmasında kısır döngüye düşüldüğünü (mutsuz olduğunu) hangi sayıya varınca anlarız?',
+ o: ['0', '1', '4', '13'],
+ a: 2,
+ why: 'Bütün mutsuz sayılar matematiksel olarak 4 döngüsüne (4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4) girer.'
+ }
+ ],
+ icice: [
+ {
+ q: 'Dış döngü 5 kez, iç döngü 4 kez dönüyorsa içteki kod toplam kaç kez çalışır?',
+ o: ['9', '20', '5', '1'],
+ a: 1,
+ why: 'İç içe döngülerde toplam çalışma sayısı çarpımdır: 5 × 4 = 20 kez.'
+ }
+ ],
+ math: [
+ {
+ q: 'Linux veya Mac terminalinde <code>math.h</code> kullanan C dosyasını derlerken hangi bayrak eklenmelidir?',
+ o: ['-math', '-lm', '-c', '-Wall'],
+ a: 1,
+ why: 'Matematik kütüphanesini bağlamak (link) için derleyici komutunun sonuna <code>-lm</code> eklenir.'
+ }
+ ],
+ pointer: [
+ {
+ q: '<code>int a = 10; int *p = &a; *p = 25;</code> çalıştıktan sonra <code>a</code> kaçtır?',
+ o: ['10', '25', '0x100 (adres)', 'Belirsiz'],
+ a: 1,
+ why: '<code>*p = 25;</code> demek, p\'nin gösterdiği adrese (yani a\'nın kutusuna) git ve 25 yaz demektir.'
+ },
+ {
+ q: 'Bir fonksiyonun <code>main</code> içindeki bir değişkeni değiştirebilmesi için fonksiyona ne gönderilmelidir?',
+ o: ['Değişkenin kopyası (değeri)', 'Değişkenin bellek adresi (pointer ile)', 'Değişkenin ismi tırnak içinde', 'math.h kütüphanesi'],
+ a: 1,
+ why: 'C dilinde fonksiyonlar parametreleri varsayılan olarak kopyalayarak alır. Asıl değişkeni değiştirmek için adresini (&a) göndermek şarttır.'
+ }
+ ],
+ malloc: [
+ {
+ q: '<code>calloc</code> ile <code>malloc</code> arasındaki temel fark nedir?',
+ o: ['calloc belleği sıfırlayarak (0) verir, malloc ise içindeki çöp değerlere dokunmaz', 'malloc Stack\'te, calloc Heap\'te yer açar', 'malloc free gerektirmez, calloc gerektirir', 'calloc sadece char tipleri içindir'],
+ a: 0,
+ why: 'calloc tahsis ettiği tüm baytları sıfırlar (0 ile doldurur), malloc ise hafızada ne varsa olduğu gibi bırakır (çöp değer).'
+ },
+ {
+ q: 'free(p) yapıldıktan sonra <code>p = NULL;</code> yazılmasının temel sebebi nedir?',
+ o: ['Bilgisayarı kapatmak için', 'Sarkan pointer (dangling pointer) oluşmasını ve yanlışlıkla eski adrese yazılmasını engellemek için', 'malloc hafızayı geri alsın diye', 'Sadece süs olsun diye'],
+ a: 1,
+ why: 'free edildikten sonra p hâlâ eski adresi tutar. p = NULL yaparak o adresi tamamen unutmasını ve kazara veri bozulmasını önleriz.'
+ }
+ ],
+ matris: [
+ {
+ q: '<code>int m[3][4];</code> tanımlamasında matris kaç satır ve kaç sütundan oluşur?',
+ o: ['3 sütun, 4 satır', '3 satır, 4 sütun', '12 satır, 1 sütun', 'Yalnızca 7 eleman'],
+ a: 1,
+ why: 'C dilinde matrislerde <code>m[satır][sütun]</code> sırası geçerlidir. Yani 3 satır, 4 sütun.'
+ }
+ ]
+};
+
+function renderQuizzes() {
+ $$('.quiz').forEach(el => {
+ const qid = el.dataset.quiz;
+ const list = QUIZ_DATA[qid];
+ if (!list) return;
+
+ let h = `<h4> Kendini Sına (${qid.toUpperCase()})</h4>`;
+ list.forEach((item, qIdx) => {
+ h += `<div class="qq" id="qq-${qid}-${qIdx}">
+ <div class="qt">${qIdx + 1}. ${item.q}</div>
+ <div class="opts">
+ ${item.o.map((opt, oIdx) => `<button class="opt" data-qid="${qid}" data-q="${qIdx}" data-o="${oIdx}">${opt}</button>`).join('')}
+ </div>
+ <div class="why">${item.why}</div>
+ </div>`;
+ });
+ el.innerHTML = h;
+ });
+
+ // Seçenek tıklama dinleyicileri
+ $$('.qq .opt').forEach(btn => {
+ btn.onclick = () => {
+ const qid = btn.dataset.qid;
+ const qIdx = parseInt(btn.dataset.q);
+ const oIdx = parseInt(btn.dataset.o);
+ const data = QUIZ_DATA[qid][qIdx];
+ const qqEl = $(`#qq-${qid}-${qIdx}`);
+
+ if (qqEl.classList.contains('answered')) return; // Bir kez yanıtlandıysa kilitle
+
+ qqEl.classList.add('answered');
+ const allBtns = $$('.opt', qqEl);
+
+ if (oIdx === data.a) {
+ btn.classList.add('right');
+ } else {
+ btn.classList.add('wrong');
+ allBtns[data.a].classList.add('right');
+ }
+ };
+ });
+}
+renderQuizzes();
+
+/* =====================================================================
+ SAYFA İÇİ GEZİNME & MENÜ
+ ===================================================================== */
+// Menü aç / kapat (mobil)
+const menuBtn = $('#menuBtn');
+const side = $('#side');
+menuBtn.onclick = () => side.classList.toggle('open');
+
+// Linke tıklayınca mobilde menüyü kapat
+$$('#side a').forEach(a => {
+ a.onclick = () => side.classList.remove('open');
+});
+
+// Kaydırma çubuğu ve aktif menü güncellemesi
+window.onscroll = () => {
+ const winScroll = document.documentElement.scrollTop;
+ const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+ const scrolled = (winScroll / height) * 100;
+ $('#progress').style.width = scrolled + '%';
+
+ // Aktif bölüm
+ const sections = $$('section');
+ let curSec = '';
+ sections.forEach(sec => {
+ const top = sec.offsetTop - 120;
+ if (winScroll >= top) curSec = sec.id;
+ });
+
+ $$('#side a').forEach(a => {
+ a.classList.toggle('active', a.getAttribute('href') === '#' + curSec);
+ });
+};
+</script>
+</body>
+</html>
